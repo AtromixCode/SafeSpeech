@@ -8,6 +8,12 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 
 Vue.config.productionTip = false;
 Vue.prototype.$socket = socket;
+import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
+
+// Make BootstrapVue available throughout your project
+Vue.use(BootstrapVue);
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin);
 
 new Vue({
   router,
@@ -16,9 +22,3 @@ new Vue({
     return h(App);
   },
 }).$mount("#app");
-import { BootstrapVue, IconsPlugin } from "bootstrap-vue";
-
-// Make BootstrapVue available throughout your project
-Vue.use(BootstrapVue);
-// Optionally install the BootstrapVue icon components plugin
-Vue.use(IconsPlugin);

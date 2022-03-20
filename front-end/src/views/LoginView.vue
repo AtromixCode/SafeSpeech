@@ -1,15 +1,12 @@
 <template>
-  <div><b-button @click="sendMessage">Send something</b-button></div>
+  <div><hello-world /></div>
 </template>
 
 <script>
+import HelloWorld from "@/components/HelloWorld.vue";
 export default {
+  components: { HelloWorld },
   name: "LoginView",
-  methods: {
-    sendMessage() {
-      this.$socket.emit("message", "A message");
-    },
-  },
 };
 </script>
 
