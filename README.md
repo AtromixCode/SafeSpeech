@@ -3,13 +3,14 @@
 ## Project setup
 
 ```
+cd front-end
 npm install
+npm run lint
 ```
 
 ### Compiles and hot-reloads for development
 
 ```
-cd front-end
 npm run serve
 ```
 
