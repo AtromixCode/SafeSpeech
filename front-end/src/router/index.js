@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import LoginView from "@/views/LoginView.vue";
+import LoginView from "@/views/Login.vue";
 import ChatView from "@/views/ChatView.vue";
 
 Vue.use(VueRouter);
