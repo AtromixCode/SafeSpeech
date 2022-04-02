@@ -7,6 +7,8 @@ const io = require("socket.io")(http, {
 });
 const port = 8000;
 
+const {MongoClient} = require('mongodb');
+
 io.on("connection", (socket) => {
   console.log("Connection started");
 
