@@ -5,6 +5,8 @@ services:
     build: ./front-end
     container_name: safe-speech-front-end
     hostname: front-end
+    environment:
+      - VUE_APP_BACK_END_URL=http://safespeech.onthewifi.com:8000
     ports:
       - "80:8080"
 
