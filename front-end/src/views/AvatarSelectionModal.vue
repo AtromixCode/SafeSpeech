@@ -46,6 +46,15 @@ export default {
   vertical-align: middle;
 }
 
+.modal-footer {
+  text-align: center;
+}
+
+.modal-footer > button {
+  width: 300px;
+  height: 40px;
+}
+
 .modal-container {
   width: 700px;
   margin: 0px auto;
