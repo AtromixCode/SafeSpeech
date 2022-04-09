@@ -2,6 +2,8 @@ name: Deployment Workflow
 on:
   push:
     branches: [main]
+    
+  workflow_dispatch:
 
 jobs:
   job_one:
@@ -15,4 +17,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.DEPLOY_KEY }}
           port: 22
-          script: ls
+          script: |
+            cd SafeSpeech
+            git pull
+            docker-compose up --build -d

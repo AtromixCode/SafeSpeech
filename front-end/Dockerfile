@@ -9,6 +9,8 @@ WORKDIR /app
 # copy both 'package.json' and 'package-lock.json' (if available)
 COPY package*.json ./
 
+ENV VUE_APP_BACK_END_URL=http://safespeech.onthewifi.com:8000
+
 # install project dependencies
 RUN npm ci
 

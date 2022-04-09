@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   front-end:
@@ -6,11 +6,12 @@ services:
     container_name: safe-speech-front-end
     hostname: front-end
     ports:
-      - '8080:8080'
+      - "80:8080"
 
   back-end:
     build: ./back-end
+    # image: test:latest
     container_name: safe-speech-back-end
     hostname: back-end
     ports:
-      - '8000:8000'
+      - "8000:8000"
