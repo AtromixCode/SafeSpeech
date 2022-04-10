@@ -133,40 +133,7 @@ const decrypt = async (encryptedData, key, iv) => {
   );
   return decode(encoded);
 };
-// const generateKey = () => {
-//   return window.crypto.subtle.generateKey(
-//       {
-//         name: "AES-GCM",
-//         length: 256,
-//       },
-//       true,
-//       ["encrypt", "decrypt"]
-//   );
-// };
-// const app = async () => {
-//   // encrypt message
-//   const first = "Hello, World!";
-//   console.log(first);
-//   const key = await generateKey();
-//   console.log(key);
-//   const rval = await encrypt(first, key);
-//   console.log(rval.iv);
-//   console.log(rval.encryptedData);
-//
-//   const response = {
-//     cipher: pack(rval.encryptedData),
-//     iv: pack(rval.iv),
-//   };
-//
-//   // unpack and decrypt message
-//   const final = await decrypt(
-//     unpack(response.cipher),
-//     key,
-//     unpack(response.iv)
-//   );
-//   console.log(final); // logs 'Hello, World!'
-// };
-// app();
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
