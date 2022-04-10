@@ -108,8 +108,6 @@ export default {
   methods: {
     login() {
       if (this.input.username != "" && this.input.password != "") {
-        // This should actually be an api call not a check against this.$parent.mockAccount
-
         var username = this.input.username;
         var password = this.input.password;
         var saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {

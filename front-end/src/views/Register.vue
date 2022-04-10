@@ -153,16 +153,12 @@ export default {
   methods: {
     register() {
       if (this.input.username != "" && this.input.password != "") {
-        // This should actually be an api call not a check against this.$parent.mockAccount
-        if (
-          this.input.username == this.$parent.mockAccount.username &&
-          this.input.password == this.$parent.mockAccount.password
-        ) {
-          this.$emit("authenticated", true);
-          this.$router.replace({ name: "Secure" });
-        } else {
-          console.log("The username and / or password is incorrect");
-        }
+        var username = this.input.username;
+        var password = this.input.password;
+        var saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
+          bcrypt.hash(password, salt, function (err, hash) {});
+        });
+        // store saltedHash and username in DB
       } else {
         console.log("A username and password must be present");
       }
