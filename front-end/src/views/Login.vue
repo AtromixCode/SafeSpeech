@@ -92,6 +92,9 @@
 </template>
 
 <script>
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 export default {
   name: "LoginView",
   data() {
@@ -106,15 +109,22 @@ export default {
     login() {
       if (this.input.username != "" && this.input.password != "") {
         // This should actually be an api call not a check against this.$parent.mockAccount
-        if (
-          this.input.username == this.$parent.mockAccount.username &&
-          this.input.password == this.$parent.mockAccount.password
-        ) {
-          this.$emit("authenticated", true);
-          this.$router.replace({ name: "Secure" });
-        } else {
-          console.log("The username and / or password is incorrect");
-        }
+
+        var username = this.input.username;
+        var password = this.input.password;
+        var saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
+          bcrypt.hash(password, salt, function (err, hash) {});
+        });
+
+        var hash = "hash from database";
+
+        bcrypt.compare(saltedHash, hash, function (err, result) {
+          if (result) {
+            console.log("It matches!");
+          } else {
+            console.log("Invalid password!");
+          }
+        });
       } else {
         console.log("A username and password must be present");
       }
