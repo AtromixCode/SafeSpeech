@@ -6,10 +6,7 @@
           <img src="../assets/Logo.svg" />
           <div id="register">
             <p>Choose a profile avatar</p>
-            <img
-              src="../assets/ProfilePicture1.svg"
-              @click="showModal = true"
-            />
+            <img :src="avatar_preview" @click="showModal = true" />
             <div class="form-control">
               <input
                 type="text"
@@ -31,11 +28,12 @@
             <div class="form-control">
               <input
                 type="password"
-                id="password"
-                name="password"
-                v-model="input.password"
+                id="password-confirm"
+                name="password-confirm"
+                v-model="input.password_confirm"
                 placeholder="Confirm password"
               />
+              <router-link to="/">Have an account? Login here!</router-link>
             </div>
             <button type="button" class="btn btn-dark" v-on:click="register()">
               Register
@@ -53,7 +51,11 @@
 
       <Teleport to="body">
         <!-- use the modal component, pass in the prop -->
-        <modal :show="showModal" @close="showModal = false">
+        <modal
+          :show="showModal"
+          @close="showModal = false"
+          @saveAvatar="saveAvatar"
+        >
           <template #header>
             <h3>custom header</h3>
           </template>
@@ -68,10 +70,7 @@
           <img src="../assets/Logo.svg" width="70%" height="auto" />
           <div id="registermobile">
             <p>Choose a profile avatar</p>
-            <img
-              src="../assets/ProfilePicture1.svg"
-              @click="showModal = true"
-            />
+            <img :src="avatar_preview" @click="showModal = true" />
             <div class="form-control">
               <input
                 type="text"
@@ -93,11 +92,12 @@
             <div class="form-control">
               <input
                 type="password"
-                id="password"
-                name="password"
-                v-model="input.password"
+                id="password-confirm"
+                name="password-confirm"
+                v-model="input.password_confirm"
                 placeholder="Confirm password"
               />
+              <router-link to="/"> Have an account? Login here! </router-link>
             </div>
             <button type="button" class="btn btn-dark" v-on:click="register()">
               Register
@@ -123,7 +123,11 @@
       />
       <Teleport to="body">
         <!-- use the modal component, pass in the prop -->
-        <modal :show="showModal" @close="showModal = false">
+        <modal
+          :show="showModal"
+          @close="showModal = false"
+          @saveAvatar="saveAvatar"
+        >
           <template #header>
             <h3>custom header</h3>
           </template>
@@ -143,6 +147,7 @@ export default {
   data() {
     return {
       showModal: false,
+      avatar_preview: "/img/ProfilePicture1.b2c1f36d.svg",
       input: {
         username: "",
         password: "",
@@ -164,6 +169,11 @@ export default {
       } else {
         console.log("A username and password must be present");
       }
+    },
+    saveAvatar(avatar) {
+      // Save the avatar path and replaces the preview image.
+      this.avatar_preview = avatar;
+      this.selected_avatar = avatar;
     },
     isMobile() {
       if (
