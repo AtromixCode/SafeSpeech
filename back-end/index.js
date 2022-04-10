@@ -10,8 +10,9 @@ const port = 8000;
 io.on("connection", (socket) => {
   console.log("Connection started");
 
-  socket.on("message", (data) => {
-    console.log(data);
+  socket.on("message", (obj) => {
+    console.log(obj);
+    io.to(socket.id).emit("message", obj);
   });
 });
 
