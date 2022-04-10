@@ -135,6 +135,8 @@
 
 <script>
 import Modal from "./AvatarSelectionModal.vue";
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 
 export default {
   name: "RegisterView",
