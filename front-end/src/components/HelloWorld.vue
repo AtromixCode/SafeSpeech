@@ -3,7 +3,10 @@
 </template>
 
 <script>
-let key = null;
+let pubKey = null;
+let privKey = null;
+const user = "JD";
+const encAlgo = "RSA-OAEP";
 export default {
   name: "HelloWorld",
   props: {
@@ -14,25 +17,40 @@ export default {
       console.log("SEND MESSAGE");
       const msg = "A message";
       console.log(msg);
-      key = await window.crypto.subtle.generateKey(
-        {
-          name: "AES-GCM",
-          length: 256,
-        },
-        true,
-        ["encrypt", "decrypt"]
-      );
-      console.log(key);
-      const rval = await encrypt(msg, key);
-      console.log(rval.iv);
-      console.log(rval.encryptedData);
+      if (!privKey) {
+        console.log("GENERATING KEY");
+        let keys = await window.crypto.subtle.generateKey(
+          {
+            name: encAlgo,
+            modulusLength: 2048,
+            publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+            hash: { name: "SHA-256" },
+          },
+          false,
+          ["encrypt", "decrypt"]
+        );
+        console.log(keys);
+        pubKey = keys.publicKey;
+        privKey = keys.privateKey;
+        let pubKeyObj = {
+          user: user,
+          key: await window.crypto.subtle.exportKey("jwk", pubKey),
+        };
+        console.log(pubKeyObj);
+        this.$socket.emit("pubkey", pubKeyObj);
+        console.log("FINISHED GENERATING KEY");
+      }
+      console.log("ENCRYPTING AND SENDING MESSAGE");
+      const rval = await encrypt(msg, pubKey);
+      // console.log(rval.iv);
+      // console.log(rval.encryptedData);
 
-      const obj = {
+      const encMsgObj = {
         encryptedMsg: pack(rval.encryptedData),
         iv: pack(rval.iv),
       };
-      console.log(obj);
-      this.$socket.emit("message", obj);
+      console.log(encMsgObj);
+      this.$socket.emit("message", encMsgObj);
     },
   },
   mounted() {
@@ -41,23 +59,14 @@ export default {
       console.log(obj);
       const final = await decrypt(
         unpack(obj.encryptedMsg),
-        key,
+        privKey,
         unpack(obj.iv)
       );
       console.log(final);
     });
   },
 };
-const generateKey = () => {
-  return window.crypto.subtle.generateKey(
-    {
-      name: "AES-GCM",
-      length: 256,
-    },
-    true,
-    ["encrypt", "decrypt"]
-  );
-};
+
 // let key = null;
 // async function createKey() {
 //
@@ -81,7 +90,7 @@ const encrypt = async (data, key) => {
   // console.log(iv);
   const encryptedData = await window.crypto.subtle.encrypt(
     {
-      name: "AES-GCM",
+      name: encAlgo,
       iv: iv,
     },
     key,
@@ -116,7 +125,7 @@ const decode = (bytestream) => {
 const decrypt = async (encryptedData, key, iv) => {
   const encoded = await window.crypto.subtle.decrypt(
     {
-      name: "AES-GCM",
+      name: encAlgo,
       iv: iv,
     },
     key,
@@ -124,30 +133,40 @@ const decrypt = async (encryptedData, key, iv) => {
   );
   return decode(encoded);
 };
-const app = async () => {
-  // encrypt message
-  const first = "Hello, World!";
-  console.log(first);
-  const key = await generateKey();
-  console.log(key);
-  const rval = await encrypt(first, key);
-  console.log(rval.iv);
-  console.log(rval.encryptedData);
-
-  const response = {
-    cipher: pack(rval.encryptedData),
-    iv: pack(rval.iv),
-  };
-
-  // unpack and decrypt message
-  const final = await decrypt(
-    unpack(response.cipher),
-    key,
-    unpack(response.iv)
-  );
-  console.log(final); // logs 'Hello, World!'
-};
-app();
+// const generateKey = () => {
+//   return window.crypto.subtle.generateKey(
+//       {
+//         name: "AES-GCM",
+//         length: 256,
+//       },
+//       true,
+//       ["encrypt", "decrypt"]
+//   );
+// };
+// const app = async () => {
+//   // encrypt message
+//   const first = "Hello, World!";
+//   console.log(first);
+//   const key = await generateKey();
+//   console.log(key);
+//   const rval = await encrypt(first, key);
+//   console.log(rval.iv);
+//   console.log(rval.encryptedData);
+//
+//   const response = {
+//     cipher: pack(rval.encryptedData),
+//     iv: pack(rval.iv),
+//   };
+//
+//   // unpack and decrypt message
+//   const final = await decrypt(
+//     unpack(response.cipher),
+//     key,
+//     unpack(response.iv)
+//   );
+//   console.log(final); // logs 'Hello, World!'
+// };
+// app();
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
