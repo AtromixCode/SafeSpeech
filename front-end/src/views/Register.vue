@@ -161,6 +161,7 @@ export default {
           bcrypt.hash(password, salt, function (err, hash) {});
         });
         // store saltedHash and username in DB
+        // route to chat page
       } else {
         console.log("A username and password must be present");
       }

@@ -119,6 +119,7 @@ export default {
         bcrypt.compare(saltedHash, hash, function (err, result) {
           if (result) {
             console.log("It matches!");
+            // route to chat page
           } else {
             console.log("Invalid password!");
           }
