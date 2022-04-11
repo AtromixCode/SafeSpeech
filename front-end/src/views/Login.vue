@@ -23,6 +23,9 @@
                 v-model="input.password"
                 placeholder="Password"
               />
+              <router-link to="/register">
+                No Account? Register here!
+              </router-link>
             </div>
             <button type="button" class="btn btn-dark" v-on:click="login()">
               Login
@@ -62,10 +65,9 @@
                 v-model="input.password"
                 placeholder="Password"
               />
-            </div>
-            <button type="button" class="btn btn-dark" v-on:click="login()">
-              Login
-            </button>
+              <router-link to="/register">
+                No Account? Register here!
+              </router-link>
             <button type="button" class="btn btn-light" v-on:click="login()">
               Cancel
             </button>
@@ -116,7 +118,7 @@ export default {
 
         var hash = "hash from database";
 
-        bcrypt.compare(saltedHash, hash, function (err, result) {
+       bcrypt.compare(saltedHash, hash, function (err, result) {
           if (result) {
             console.log("It matches!");
             // route to chat page

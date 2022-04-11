@@ -13,12 +13,22 @@ export default {
         <div class="modal-wrapper">
           <div class="modal-container">
             <div class="modal-body">
-              <img src="../assets/ProfilePicture1.svg" />
-              <img src="../assets/ProfilePicture2.svg" />
+              <img
+                src="../assets/ProfilePicture1.svg"
+                @click="
+                  selectAvatar('/img/ProfilePicture1.b2c1f36d.svg', $event)
+                "
+              />
+              <img
+                src="../assets/ProfilePicture2.svg"
+                @click="
+                  selectAvatar('/img/ProfilePicture2.099b49b8.svg', $event)
+                "
+              />
             </div>
 
             <div class="modal-footer">
-              <button class="btn btn-dark" @click="$emit('close')">
+              <button class="btn btn-dark" @click="registerAvatar">
                 Select
               </button>
               <button class="btn btn-light" @click="$emit('close')">
@@ -36,11 +46,21 @@ export default {
         <div class="modal-wrapper">
           <div class="modal-container-mobile">
             <div class="modal-body-mobile">
-              <img src="../assets/ProfilePicture1.svg" />
-              <img src="../assets/ProfilePicture2.svg" />
+              <img
+                src="../assets/ProfilePicture1.svg"
+                @click="
+                  selectAvatar('/img/ProfilePicture1.b2c1f36d.svg', $event)
+                "
+              />
+              <img
+                src="../assets/ProfilePicture2.svg"
+                @click="
+                  selectAvatar('/img/ProfilePicture2.099b49b8.svg', $event)
+                "
+              />
             </div>
             <div class="modal-footer">
-              <button class="btn btn-dark" @click="$emit('close')">
+              <button class="btn btn-dark" @click="registerAvatar">
                 Select
               </button>
               <button class="btn btn-light" @click="$emit('close')">
@@ -56,10 +76,29 @@ export default {
 
 <script>
 export default {
+  data() {
+    return {
+      selected_avatar: {},
+    };
+  },
   props: {
     show: Boolean,
   },
   methods: {
+    selectAvatar(avatar, event) {
+      if (this.activeLink) {
+        this.activeLink.classList.remove("selected");
+      }
+      this.activeLink = event.target;
+      this.activeLink.classList.add("selected");
+
+      this.selected_avatar = avatar;
+      console.log(this.selected_avatar);
+    },
+    registerAvatar() {
+      this.$emit("saveAvatar", this.selected_avatar);
+      this.$emit("close");
+    },
     isMobile() {
       if (
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -76,6 +115,9 @@ export default {
 </script>
 
 <style>
+.selected {
+  border: 5px solid green;
+}
 .modal-mask {
   position: fixed;
   z-index: 9998;
