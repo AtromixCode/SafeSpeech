@@ -1,9 +1,14 @@
 <template>
-  <div class="bar">Side bar</div>
+  <div class="bar">
+    Side bar
+    <chat-options />
+  </div>
 </template>
 
 <script>
+import ChatOptions from "./ChatOptions.vue";
 export default {
+  components: { ChatOptions },
   name: "SideBar",
 };
 </script>
