@@ -14,10 +14,16 @@ io.on("connection", (socket) => {
     console.log(obj);
     io.to(socket.id).emit("message", obj);
   });
-  socket.on("pubkey", (obj)=>{
+  socket.on("set pubkey", (obj)=>{
     console.log(obj);
     userKeys.set(obj.user, obj.key);
     console.log(userKeys.get(obj.user));
+  });
+  socket.on("get pubkey", (obj)=>{
+    console.log("Pub key request for "+obj.user);
+    let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
+    console.log(pubKey);
+    io.to(socket.id).emit("pubkey", pubKey);
   });
 });
 
