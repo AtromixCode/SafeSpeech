@@ -9,12 +9,12 @@ const routes = [
   {
     path: "/",
     name: "login",
-    component: ChatView,
+    component: LoginView,
   },
   {
     path: "/chat",
     name: "chat",
-    component: LoginView,
+    component: ChatView,
   },
 ];
 
