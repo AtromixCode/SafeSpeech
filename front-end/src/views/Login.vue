@@ -97,6 +97,14 @@
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
+const io = require("socket.io")(http, {
+  cors: {
+    origin: "*",
+  },
+});
+
+var socket = io();
+
 export default {
   name: "LoginView",
   data() {
@@ -116,15 +124,19 @@ export default {
           bcrypt.hash(password, salt, function (err, hash) {});
         });
 
-        var hash = "hash from database";
+        socket.emit("check login credentials", {
+          userName: username,
+          password: saltedHash,
+        });
 
-       bcrypt.compare(saltedHash, hash, function (err, result) {
-          if (result) {
-            console.log("It matches!");
-            // route to chat page
-          } else {
-            console.log("Invalid password!");
-          }
+        socket.on("login ok", function (user) {
+          //login
+          this.$router.push("/chat");
+        });
+
+        socket.on("bad credentials", function () {
+          //throw error
+          alert("bad credentials");
         });
       } else {
         console.log("A username and password must be present");

@@ -35,6 +35,27 @@ async function addUser(user) {
   }
 }
 
+async function checkUser(user) {
+  try {
+    await client.connect();
+    var query = { username: user.userName };
+    const result = await client
+      .db("safe_speech")
+      .collection("users")
+      .find(query)
+      .toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+      });
+    return result;
+  } catch (e) {
+    console.log(e.message);
+  } finally {
+    await client.close();
+  }
+}
+
 addUser({
   userName: "TestUser",
   password: "Gibberish",
@@ -46,6 +67,23 @@ io.on("connection", (socket) => {
   socket.on("message", (data) => {
     console.log(data);
   });
+});
+
+socket.on("check login credentials", function (credentials) {
+  //login
+  result = checkUser(credentials);
+  if (result.length == 0) {
+    socket.emit("bad credentials");
+  } else {
+    var hash = result[0].password;
+    bcrypt.compare(saltedHash, hash, function (err, result) {
+      if (result) {
+        socket.emit("login ok", result[0]);
+      } else {
+        socket.emit("bad credentials");
+      }
+    });
+  }
 });
 
 http.listen(port, () => {
