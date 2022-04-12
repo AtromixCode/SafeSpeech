@@ -1,4 +1,3 @@
-require("dotenv").config();
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http, {
@@ -9,6 +8,7 @@ const io = require("socket.io")(http, {
 const mongoUser = process.env.MONGO_USER;
 const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
+let userKeys = new Map();
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -87,8 +87,20 @@ addMessage("TestUsername", {
 io.on("connection", (socket) => {
   console.log("Connection started");
 
-  socket.on("message", (data) => {
-    console.log(data);
+  socket.on("message", (obj) => {
+    console.log(obj);
+    io.to(socket.id).emit("message", obj);
+  });
+  socket.on("set pubkey", (obj)=>{
+    console.log(obj);
+    userKeys.set(obj.user, obj.key);
+    console.log(userKeys.get(obj.user));
+  });
+  socket.on("get pubkey", (obj)=>{
+    console.log("Pub key request for "+obj.user);
+    let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
+    console.log(pubKey);
+    io.to(socket.id).emit("pubkey", pubKey);
   });
 });
 
