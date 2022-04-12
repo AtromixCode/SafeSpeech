@@ -6,7 +6,6 @@ import socket from "../socket";
 import keyStore from "./keyStore";
 import user from "./user";
 
-
 Vue.use(Vuex);
 const websocketPlugin = createWebSocketPlugin(socket);
 export default new Vuex.Store({

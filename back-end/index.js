@@ -40,30 +40,36 @@ const tomorrow = new Date();
 // Add 1 Day
 tomorrow.setDate(today.getDate() + 2);
 
-async function addMessage(userName, message) {
+async function addMessage(userName, message, chatId) {
   try {
     await client.connect();
 
     const result = await client
       .db("safe_speech")
-      .collection("chats")
-      .insertOne({
-        messages: [
-          {
+      .collection("chats").insertOne({
+
             timeStamp: today,
-            content: "This is a message",
-            from: "AnoterUserName",
-          },
-          {
-            timeStamp: tomorrow,
-            content: "This is a message",
-            from: "TestUsername",
-          },
-        ],
-        title: "Example title",
-        members: ["AnoterUserName", "TestUsername"],
-        lastUpdated: today,
-      });
+            content: message,
+            from: userName,
+            chatId: chatId
+        })
+      // .insertOne({
+      //   messages: [
+      //     {
+      //       timeStamp: today,
+      //       content: "This is a message",
+      //       from: "AnoterUserName",
+      //     },
+      //     {
+      //       timeStamp: tomorrow,
+      //       content: "This is a message",
+      //       from: "TestUsername",
+      //     },
+      //   ],
+      //   title: "Example title",
+      //   members: ["AnoterUserName", "TestUsername"],
+      //   lastUpdated: today,
+      // });
 
     console.log(result);
   } catch (e) {
@@ -86,10 +92,14 @@ addMessage("TestUsername", {
 
 io.on("connection", (socket) => {
   console.log("Connection started");
-
+  // TODO add user to all relevant rooms
   socket.on("message", (obj) => {
     console.log(obj);
-    io.to(socket.id).emit("message", obj);
+    // TODO save message into DB
+    addMessage(obj.from, obj.content, obj.chatId)
+    // TODO send message to all users in the room
+    io.emit("message", obj);
+    // io.to(socket.id).emit("message", obj);
   });
   socket.on("set pubkey", (obj)=>{
     console.log(obj);

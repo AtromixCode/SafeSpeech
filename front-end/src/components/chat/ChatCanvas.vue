@@ -36,13 +36,25 @@ export default {
   data() {
     return {
       msgInput: "",
+      currentChat: "testChat",
     };
   },
   name: "ChatCanvas",
   methods: {
     sendMessage() {
-      this.$socket.emit("message", this.msgInput);
+      let payload = {
+        content: this.msgInput,
+        chatId: this.currentChat,
+        from: this.$store.state.user.userName,
+      };
+      this.$socket.emit("message", payload);
     },
+  },
+  mounted() {
+    this.$socket.on("message", (payload) => {
+      // TODO display
+      console.log(payload);
+    });
   },
 };
 </script>
