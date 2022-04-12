@@ -76,7 +76,7 @@ async function checkLoginCredentials(user, socket) {
         console.log(result);
         db.close();
       });
-    if (result.length == 0) {
+    if (result == undefined) {
       socket.emit("bad credentials");
     } else {
       let hash = result[0].password;
