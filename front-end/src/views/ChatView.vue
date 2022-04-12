@@ -8,15 +8,39 @@
 <script>
 import SideBar from "@/components/chat/SideBar.vue";
 import ChatCanvas from "../components/chat/ChatCanvas.vue";
+const today = new Date();
+const tomorrow = new Date();
+
+// Add 1 Day
+tomorrow.setDate(today.getDate() + 1);
 export default {
   components: { SideBar, ChatCanvas },
   name: "ChatView",
   beforeCreate() {
     let testUserInfo = {
-      userName: "Test Username",
+      userName: "TestUsername",
+      chats: [
+        {
+          messages: [
+            {
+              timeStamp: today,
+              content: "This is a message",
+              from: "AnoterUserName",
+            },
+            {
+              timeStamp: tomorrow,
+              content: "This is a message",
+              from: "TestUsername",
+            },
+          ],
+          title: "Example title",
+          members: ["AnoterUserName", "TestUsername"],
+          lastUpdated: today,
+        },
+      ],
     };
     this.$store.commit("user/setUserInfo", testUserInfo);
-    console.log(this.$store.state.user);
+    console.log(this.$store.state.user.chats);
   },
 };
 </script>

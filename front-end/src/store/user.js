@@ -17,17 +17,14 @@ export default {
     },
 
     setUserInfo(state, userInfo) {
-      console.log(state);
-      state = {};
-      console.log(state);
       Object.entries(userInfo).forEach(([k, v]) => {
         state[k] = v;
       });
-      console.log(state);
+      return state;
     },
 
     resetUserInfo(state) {
-      state = {
+      let emptyState = {
         userName: "",
         chats: [
           {
@@ -38,7 +35,9 @@ export default {
           },
         ],
       };
-      return state;
+      Object.entries(emptyState).forEach(([k, v]) => {
+        state[k] = v;
+      });
     },
   },
 };

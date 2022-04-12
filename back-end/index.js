@@ -34,10 +34,54 @@ async function addUser(user) {
     await client.close();
   }
 }
+const today = new Date();
+const tomorrow = new Date();
 
-addUser({
-  userName: "TestUser",
-  password: "Gibberish",
+// Add 1 Day
+tomorrow.setDate(today.getDate() + 2);
+
+async function addMessage(userName, message) {
+  try {
+    await client.connect();
+
+    const result = await client
+      .db("safe_speech")
+      .collection("chats")
+      .insertOne({
+        messages: [
+          {
+            timeStamp: today,
+            content: "This is a message",
+            from: "AnoterUserName",
+          },
+          {
+            timeStamp: tomorrow,
+            content: "This is a message",
+            from: "TestUsername",
+          },
+        ],
+        title: "Example title",
+        members: ["AnoterUserName", "TestUsername"],
+        lastUpdated: today,
+      });
+
+    console.log(result);
+  } catch (e) {
+    console.log(e.message);
+    if (e.code == 11000) {
+      console.log(
+        "The userName is a unique index, please add handle of error so that the user knows they need another user name"
+      );
+    }
+  } finally {
+    await client.close();
+  }
+}
+
+addMessage("TestUsername", {
+  timeStamp: tomorrow,
+  content: "This is a future message",
+  from: "AnoterUserName",
 });
 
 io.on("connection", (socket) => {
