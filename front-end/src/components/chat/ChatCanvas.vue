@@ -11,9 +11,15 @@
           <b-form-input
             placeholder="Enter a message 😎"
             class="input-text"
+            v-model="msgInput"
           ></b-form-input>
           <b-input-group-append>
-            <b-button pill variant="dark" class="mx-2 px-4 send-button">
+            <b-button
+              @click="sendMessage"
+              pill
+              variant="dark"
+              class="mx-2 px-4 send-button"
+            >
               <b-icon icon="cursor" />
             </b-button>
           </b-input-group-append>
@@ -27,7 +33,17 @@
 import ChatOptions from "./ChatOptions.vue";
 export default {
   components: { ChatOptions },
+  data() {
+    return {
+      msgInput: "",
+    };
+  },
   name: "ChatCanvas",
+  methods: {
+    sendMessage() {
+      this.$socket.emit("message", this.msgInput);
+    },
+  },
 };
 </script>
 
