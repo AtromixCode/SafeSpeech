@@ -32,6 +32,16 @@ export default {
 </script>
 
 <style scoped>
+nav ul {
+  height: 85vh;
+  width: 100%;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding: 0;
+}
+ul::-webkit-scrollbar {
+  display: none;
+}
 .header {
   display: block;
   padding: 0;
