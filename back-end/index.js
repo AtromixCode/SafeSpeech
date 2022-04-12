@@ -43,11 +43,7 @@ async function checkUsernameExists(user, socket) {
       .db("safe_speech")
       .collection("users")
       .find(query)
-      .toArray(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        db.close();
-      });
+      .toArray();
     if (result != undefined) {
       addUser(credentials);
       console.log("username OK");
@@ -65,21 +61,19 @@ async function checkUsernameExists(user, socket) {
 
 async function checkLoginCredentials(user, socket) {
   try {
+    console.log(user);
     await client.connect();
     let query = { username: user.userName };
     const result = await client
       .db("safe_speech")
       .collection("users")
-      .find(query)
-      .toArray(function (err, result) {
-        if (err) throw err;
-        console.log(result);
-        db.close();
-      });
+      .find(query);
+
+    console.log("Here" + result);
     if (result == undefined) {
       socket.emit("bad credentials");
     } else {
-      let hash = result[0].password;
+      let hash = result.password;
       bcrypt.compare(saltedHash, hash, function (err, result) {
         if (result) {
           socket.emit("login ok", result[0]);
@@ -107,7 +101,7 @@ io.on("connection", (socket) => {
     checkUsernameExists(credentials, socket);
   });
 
-  socket.on("check login credentials", function (credentials) {
+  socket.on("check login credentials", (credentials) => {
     //login
     console.log("logging in");
     checkLoginCredentials(credentials, socket);
