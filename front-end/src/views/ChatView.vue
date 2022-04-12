@@ -8,39 +8,20 @@
 <script>
 import SideBar from "@/components/chat/SideBar.vue";
 import ChatCanvas from "../components/chat/ChatCanvas.vue";
-const today = new Date();
-const tomorrow = new Date();
+import { mapState, mapMutations } from "vuex";
 
-// Add 1 Day
-tomorrow.setDate(today.getDate() + 1);
 export default {
   components: { SideBar, ChatCanvas },
   name: "ChatView",
-  beforeCreate() {
-    let testUserInfo = {
-      userName: "TestUsername",
-      chats: [
-        {
-          messages: [
-            {
-              timeStamp: today,
-              content: "This is a message",
-              from: "AnoterUserName",
-            },
-            {
-              timeStamp: tomorrow,
-              content: "This is a message",
-              from: "TestUsername",
-            },
-          ],
-          title: "Example title",
-          members: ["AnoterUserName", "TestUsername"],
-          lastUpdated: today,
-        },
-      ],
-    };
-    this.$store.commit("user/setUserInfo", testUserInfo);
-    console.log(this.$store.state.user.chats);
+
+  computed: { ...mapState({ user: (state) => state.user }) },
+  methods: { ...mapMutations("user", ["setUserName", "setUserInfo"]) },
+  created() {
+    this.$socket.emit("message", "a message");
+  },
+
+  mounted() {
+    console.log(this.user);
   },
 };
 </script>
@@ -51,20 +32,24 @@ export default {
   height: 100%;
   box-shadow: 5px 0px 25px 5px rgb(123, 123, 123);
   -webkit-box-shadow: 5px 0px 25px 5px rgb(123, 123, 123);
+  position: absolute;
+  z-index: 10000;
 }
 .chat-canvas {
   width: 75%;
   height: 100%;
+  margin-left: 25%;
 }
 
-@media screen and (max-width: 1150px) {
+@media screen and (max-width: 1000px) {
   .side-bar {
     width: 100%;
-    height: 7%;
+    height: 6%;
   }
   .chat-canvas {
     width: 100%;
-    height: 93%;
+    height: 94%;
+    margin-left: 0;
   }
 }
 

@@ -1,18 +1,17 @@
 <template>
-  <div>
-    <b-dropdown
-      size="lg"
-      variant="light"
-      toggle-class="text-decoration-none"
-      no-caret
-      class="dropdown-btn"
+  <b-dropdown
+    size="lg"
+    variant="link"
+    toggle-class="text-decoration-none"
+    no-caret
+    right
+    class="dropdown-btn"
+  >
+    <template #button-content> <b-icon icon="three-dots" /></template>
+    <b-dropdown-item-button class="menu-button">
+      <span class="menu-button-text"> Leave Chat </span></b-dropdown-item-button
     >
-      <template #button-content> <b-icon icon="three-dots" /></template>
-      <b-dropdown-item-button class="menu-button"
-        >Leave Chat</b-dropdown-item-button
-      >
-    </b-dropdown>
-  </div>
+  </b-dropdown>
 </template>
 
 <script>
@@ -20,39 +19,21 @@ export default { name: "ChatOptions" };
 </script>
 
 <style>
-.btn-light,
-.btn:focus {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: inherit !important;
-  outline: none !important;
-  box-shadow: none !important;
+.menu-button {
+  background-color: #0d1b2a;
+  text-align: center;
 }
 
-.btn-check:checked + .btn-light,
-.btn-check:active + .btn-light,
-.btn-light:active,
-.btn-light.active,
-.btn-light:hover,
-.show > .btn-light.dropdown-toggle {
-  background-color: transparent !important;
-  border-color: transparent !important;
-  color: #00bd9d !important;
-  box-shadow: none !important;
+.menu-button-text {
+  color: white;
 }
 
-.dropdown-item {
+.dropdown-menu {
   background-color: #0d1b2a !important;
-  color: white !important;
-  height: 50px;
 }
 
-.dropdown-item:focus {
-  background-color: white;
-  color: #0d1b2a;
-}
-
-ul {
-  padding: 0 !important;
+.dropdown-toggle {
+  border: 0;
+  color: inherit !important;
 }
 </style>
