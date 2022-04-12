@@ -157,14 +157,6 @@ export default {
   props: {
     msg: String,
   },
-  mounted() {
-    this.$socket.on("ok username", function () {
-      this.$router.push("/chat");
-    });
-    this.$socket.on("bad username", function () {
-      alert("username taken, pick another one");
-    });
-  },
   components: {
     Modal,
   },
@@ -211,6 +203,17 @@ export default {
         return false;
       }
     },
+    goToChat() {
+      this.$router.push("/chat");
+    },
+  },
+  mounted() {
+    this.$socket.on("ok username", () => {
+      this.goToChat();
+    });
+    this.$socket.on("bad username", () => {
+      alert("username taken, pick another one");
+    });
   },
 };
 </script>

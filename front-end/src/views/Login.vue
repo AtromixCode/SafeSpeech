@@ -149,7 +149,7 @@ export default {
       //login
       this.goToChat();
     });
-    this.$socket.on("bad credentials", function () {
+    this.$socket.on("bad credentials", () => {
       //throw error
       alert("bad credentials");
     });
