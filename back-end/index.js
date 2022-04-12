@@ -69,29 +69,29 @@ io.on("connection", (socket) => {
   });
 });
 
-socket.on("check new login", function (credentials) {
+io.on("check new login", function (credentials) {
   //login
   result = checkUser(credentials);
   if (result.length == 0) {
     addUser(credentials);
-    socket.emit("ok username");
+    io.emit("ok username");
   } else {
-    socket.emit("bad username");
+    io.emit("bad username");
   }
 });
 
-socket.on("check login credentials", function (credentials) {
+io.on("check login credentials", function (credentials) {
   //login
   result = checkUser(credentials);
   if (result.length == 0) {
-    socket.emit("bad credentials");
+    io.emit("bad credentials");
   } else {
     var hash = result[0].password;
     bcrypt.compare(saltedHash, hash, function (err, result) {
       if (result) {
-        socket.emit("login ok", result[0]);
+        io.emit("login ok", result[0]);
       } else {
-        socket.emit("bad credentials");
+        io.emit("bad credentials");
       }
     });
   }
