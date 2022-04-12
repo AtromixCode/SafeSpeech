@@ -49,26 +49,38 @@ async function checkUsernameExists(user, socket) {
 
 async function checkLoginCredentials(user, socket) {
   try {
-    console.log(user);
     await client.connect();
-    let query = { username: user.userName };
+    let query = { userName: user.userName };
     const result = await client
       .db("safe_speech")
       .collection("users")
-      .find(query);
+      .findOne(query);
 
-    console.log("Here" + result);
+    console.log("query is:");
+    console.log(query);
+    console.log("result is:");
+    console.log(result);
+
     if (result == undefined) {
       socket.emit("bad credentials");
     } else {
-      let hash = result.password;
+      /*let hash = result.password;
       bcrypt.compare(saltedHash, hash, function (err, result) {
         if (result) {
           socket.emit("login ok", result[0]);
         } else {
           socket.emit("bad credentials");
         }
-      });
+      });*/
+
+      if (
+        result.password == user.password &&
+        result.userName == user.userName
+      ) {
+        socket.emit("login ok", result[0]);
+      } else {
+        socket.emit("bad credentials");
+      }
     }
   } catch (e) {
     console.log(e.message);
@@ -91,7 +103,6 @@ io.on("connection", (socket) => {
 
   socket.on("check login credentials", (credentials) => {
     //login
-    console.log("logging in");
     checkLoginCredentials(credentials, socket);
   });
 });

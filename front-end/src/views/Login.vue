@@ -95,8 +95,8 @@
 </template>
 
 <script>
-import bcrypt from "bcryptjs";
-const saltRounds = 10;
+// import bcrypt from "bcryptjs";
+// const saltRounds = 10;
 
 export default {
   name: "LoginView",
@@ -126,13 +126,14 @@ export default {
       if (this.input.username != "" && this.input.password != "") {
         let username = this.input.username;
         let password = this.input.password;
+        /*
         let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
           bcrypt.hash(password, salt, function () {});
         });
-
+        */
         this.$socket.emit("check login credentials", {
           userName: username,
-          password: saltedHash,
+          password: password,
         });
       } else {
         console.log("A username and password must be present");
