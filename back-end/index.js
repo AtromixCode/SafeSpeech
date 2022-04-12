@@ -35,7 +35,7 @@ async function addUser(user) {
   }
 }
 
-async function checkUser(user) {
+async function checkUsernameExists(user, socket) {
   try {
     await client.connect();
     let query = { username: user.userName };
@@ -48,7 +48,46 @@ async function checkUser(user) {
         console.log(result);
         db.close();
       });
-    return result;
+    if (result != undefined) {
+      addUser(credentials);
+      console.log("username OK");
+      socket.emit("ok username");
+    } else {
+      console.log("bad username");
+      socket.emit("bad username");
+    }
+  } catch (e) {
+    console.log(e.message);
+  } finally {
+    await client.close();
+  }
+}
+
+async function checkLoginCredentials(user, socket) {
+  try {
+    await client.connect();
+    let query = { username: user.userName };
+    const result = await client
+      .db("safe_speech")
+      .collection("users")
+      .find(query)
+      .toArray(function (err, result) {
+        if (err) throw err;
+        console.log(result);
+        db.close();
+      });
+    if (result.length == 0) {
+      socket.emit("bad credentials");
+    } else {
+      let hash = result[0].password;
+      bcrypt.compare(saltedHash, hash, function (err, result) {
+        if (result) {
+          socket.emit("login ok", result[0]);
+        } else {
+          socket.emit("bad credentials");
+        }
+      });
+    }
   } catch (e) {
     console.log(e.message);
   } finally {
@@ -62,34 +101,17 @@ io.on("connection", (socket) => {
   socket.on("message", (data) => {
     console.log(data);
   });
-});
 
-io.on("check new login", function (credentials) {
-  console.log("checking login");
-  result = checkUser(credentials);
-  if (result.length == 0) {
-    addUser(credentials);
-    io.emit("ok username");
-  } else {
-    io.emit("bad username");
-  }
-});
+  socket.on("check new login", function (credentials) {
+    console.log("registering");
+    checkUsernameExists(credentials, socket);
+  });
 
-io.on("check login credentials", function (credentials) {
-  //login
-  result = checkUser(credentials);
-  if (result.length == 0) {
-    io.emit("bad credentials");
-  } else {
-    let hash = result[0].password;
-    bcrypt.compare(saltedHash, hash, function (err, result) {
-      if (result) {
-        io.emit("login ok", result[0]);
-      } else {
-        io.emit("bad credentials");
-      }
-    });
-  }
+  socket.on("check login credentials", function (credentials) {
+    //login
+    console.log("logging in");
+    checkLoginCredentials(credentials, socket);
+  });
 });
 
 http.listen(port, () => {
