@@ -142,14 +142,6 @@ import Modal from "./AvatarSelectionModal.vue";
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const io = require("socket.io")(http, {
-  cors: {
-    origin: "*",
-  },
-});
-
-var socket = io();
-
 export default {
   name: "RegisterView",
   data() {
@@ -162,38 +154,44 @@ export default {
       },
     };
   },
+  props: {
+    msg: String,
+  },
+  mounted() {
+    this.$socket.on("ok username", function () {
+      this.$router.push("/chat");
+    });
+    this.$socket.on("bad username", function () {
+      alert("username taken, pick another one");
+    });
+  },
   components: {
     Modal,
   },
   methods: {
-    register() {
-      if (this.input.username != "" && this.input.password != "") {
-        var username = this.input.username;
-        var password = this.input.password;
-        var saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
-          bcrypt.hash(password, salt, function (err, hash) {});
-        });
-        // store saltedHash and username in DB
-        socket.emit("check new login", {
-          userName: username,
-          password: saltedHash,
-          pofilePicture: avatar,
-        });
-        socket.on("ok username", function () {
-          this.$router.push("/chat");
-        });
-        socket.on("bad username", function () {
-          alert("username taken, pick another one");
-        });
-        // route to chat page
-      } else {
-        console.log("A username and password must be present");
-      }
-    },
     saveAvatar(avatar) {
       // Save the avatar path and replaces the preview image.
       this.avatar_preview = avatar;
       this.selected_avatar = avatar;
+    },
+    register() {
+      if (this.input.username != "" && this.input.password != "") {
+        let username = this.input.username;
+        let password = this.input.password;
+        let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
+          bcrypt.hash(password, salt, function () {});
+        });
+        // store saltedHash and username in DB
+        this.$socket.emit("check new login", {
+          userName: username,
+          password: saltedHash,
+          pofilePicture: this.selected_avatar,
+        });
+
+        // route to chat page
+      } else {
+        console.log("A username and password must be present");
+      }
     },
     isMobile() {
       if (

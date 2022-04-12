@@ -68,9 +68,10 @@
               <router-link to="/register">
                 No Account? Register here!
               </router-link>
-            <button type="button" class="btn btn-light" v-on:click="login()">
-              Cancel
-            </button>
+              <button type="button" class="btn btn-light" v-on:click="login()">
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
         <div class="col"><img src="../assets/Mobile.svg" height="220vh" /></div>
@@ -97,14 +98,6 @@
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
-const io = require("socket.io")(http, {
-  cors: {
-    origin: "*",
-  },
-});
-
-var socket = io();
-
 export default {
   name: "LoginView",
   data() {
@@ -115,28 +108,31 @@ export default {
       },
     };
   },
+  props: {
+    msg: String,
+  },
+  mounted() {
+    this.$socket.on("login ok", function () {
+      //login
+      this.$router.push("/chat");
+    });
+    this.$socket.on("bad credentials", function () {
+      //throw error
+      alert("bad credentials");
+    });
+  },
   methods: {
     login() {
       if (this.input.username != "" && this.input.password != "") {
-        var username = this.input.username;
-        var password = this.input.password;
-        var saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
-          bcrypt.hash(password, salt, function (err, hash) {});
+        let username = this.input.username;
+        let password = this.input.password;
+        let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
+          bcrypt.hash(password, salt, function () {});
         });
 
-        socket.emit("check login credentials", {
+        this.$socket.emit("check login credentials", {
           userName: username,
           password: saltedHash,
-        });
-
-        socket.on("login ok", function (user) {
-          //login
-          this.$router.push("/chat");
-        });
-
-        socket.on("bad credentials", function () {
-          //throw error
-          alert("bad credentials");
         });
       } else {
         console.log("A username and password must be present");
