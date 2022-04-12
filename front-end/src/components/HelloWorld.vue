@@ -28,8 +28,12 @@ export default {
       console.log(msg);
       if (!privateKey) {
         console.log("No private key, trying to find one");
-        publicKey = this.$store.state.keyStore.keys.get("publicKey");
-        privateKey = this.$store.state.keyStore.keys.get("privateKey");
+        try {
+          publicKey = this.$store.state.keyStore.keys.get("publicKey");
+          privateKey = this.$store.state.keyStore.keys.get("privateKey");
+        } catch (e) {
+          console.log("Could not retrieve keys from store.");
+        }
       }
       if (!privateKey) {
         await this.generateKey();
@@ -160,8 +164,17 @@ export default {
     });
   },
   created() {
-    publicKey = this.$store.state.keyStore.keys.get("publicKey");
-    privateKey = this.$store.state.keyStore.keys.get("privateKey");
+    console.log(this.$store.state.keyStore.keys);
+    console.log(typeof this.$store.state.keyStore.keys);
+    if (this.$store.state.keyStore.keys.size === 0) {
+      console.log("Empty keys");
+    }
+    try {
+      publicKey = this.$store.state.keyStore.keys.get("publicKey");
+      privateKey = this.$store.state.keyStore.keys.get("privateKey");
+    } catch (e) {
+      console.log("Could not retrieve keys from store.");
+    }
   },
 };
 function unpack(packed) {
