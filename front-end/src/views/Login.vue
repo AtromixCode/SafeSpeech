@@ -111,16 +111,6 @@ export default {
   props: {
     msg: String,
   },
-  mounted() {
-    this.$socket.on("login ok", function () {
-      //login
-      this.$router.push("/chat");
-    });
-    this.$socket.on("bad credentials", function () {
-      //throw error
-      alert("bad credentials");
-    });
-  },
   methods: {
     login() {
       if (this.input.username != "" && this.input.password != "") {
@@ -150,6 +140,19 @@ export default {
         return false;
       }
     },
+    goToChat() {
+      this.$router.push("/chat");
+    },
+  },
+  mounted() {
+    this.$socket.on("login ok", () => {
+      //login
+      this.goToChat();
+    });
+    this.$socket.on("bad credentials", function () {
+      //throw error
+      alert("bad credentials");
+    });
   },
 };
 </script>
