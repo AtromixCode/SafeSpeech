@@ -95,7 +95,7 @@
 </template>
 
 <script>
-const bcrypt = require("bcrypt");
+import bcrypt from "bcryptjs";
 const saltRounds = 10;
 
 export default {

@@ -139,7 +139,7 @@
 
 <script>
 import Modal from "./AvatarSelectionModal.vue";
-const bcrypt = require("bcrypt");
+import bcrypt from "bcryptjs";
 const saltRounds = 10;
 
 export default {
