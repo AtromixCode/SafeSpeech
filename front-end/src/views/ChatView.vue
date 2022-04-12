@@ -11,6 +11,13 @@ import ChatCanvas from "../components/chat/ChatCanvas.vue";
 export default {
   components: { SideBar, ChatCanvas },
   name: "ChatView",
+  beforeCreate() {
+    let testUserInfo = {
+      userName: "Test Username",
+    };
+    this.$store.commit("user/setUserInfo", testUserInfo);
+    console.log(this.$store.state.user);
+  },
 };
 </script>
 
