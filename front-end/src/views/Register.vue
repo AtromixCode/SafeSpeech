@@ -142,6 +142,14 @@ import Modal from "./AvatarSelectionModal.vue";
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
+const io = require("socket.io")(http, {
+  cors: {
+    origin: "*",
+  },
+});
+
+var socket = io();
+
 export default {
   name: "RegisterView",
   data() {
@@ -166,6 +174,17 @@ export default {
           bcrypt.hash(password, salt, function (err, hash) {});
         });
         // store saltedHash and username in DB
+        socket.emit("check new login", {
+          userName: username,
+          password: saltedHash,
+          pofilePicture: avatar,
+        });
+        socket.on("ok username", function () {
+          this.$router.push("/chat");
+        });
+        socket.on("bad username", function () {
+          alert("username taken, pick another one");
+        });
         // route to chat page
       } else {
         console.log("A username and password must be present");

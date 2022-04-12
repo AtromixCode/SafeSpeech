@@ -69,6 +69,17 @@ io.on("connection", (socket) => {
   });
 });
 
+socket.on("check new login", function (credentials) {
+  //login
+  result = checkUser(credentials);
+  if (result.length == 0) {
+    addUser(credentials);
+    socket.emit("ok username");
+  } else {
+    socket.emit("bad username");
+  }
+});
+
 socket.on("check login credentials", function (credentials) {
   //login
   result = checkUser(credentials);
