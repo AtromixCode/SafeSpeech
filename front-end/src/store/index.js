@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import createWebSocketPlugin from "./websocketStorePlugin";
 import socket from "../socket";
 import keyStore from "./keyStore";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 const websocketPlugin = createWebSocketPlugin(socket);
@@ -14,5 +15,5 @@ export default new Vuex.Store({
   modules: {
     keyStore: keyStore,
   },
-  plugins: [websocketPlugin],
+  plugins: [createPersistedState(), websocketPlugin],
 });
