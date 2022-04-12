@@ -139,8 +139,8 @@
 
 <script>
 import Modal from "./AvatarSelectionModal.vue";
-import bcrypt from "bcryptjs";
-const saltRounds = 10;
+//import bcrypt from "bcryptjs";
+//const saltRounds = 10;
 
 export default {
   name: "RegisterView",
@@ -182,14 +182,14 @@ export default {
       ) {
         let username = this.input.username;
         let password = this.input.password;
-        bcrypt.genSalt(saltRounds, function (err, salt) {
+        /*bcrypt.genSalt(saltRounds, function (err, salt) {
           bcrypt.hash(password, salt, function (err, salt) {
             if (err) {
               console.log(salt);
               console.log(err);
             }
           });
-        });
+        });*/
         // store saltedHash and username in DB
         this.$socket.emit("check new login", {
           userName: username,

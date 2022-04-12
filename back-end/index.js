@@ -14,7 +14,7 @@ const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
-async function addUser(user) {
+async function addUser(user, socket) {
   try {
     await client.connect();
 
@@ -23,16 +23,15 @@ async function addUser(user) {
       .collection("users")
       .insertOne(user);
 
+    console.log("username OK");
+    socket.emit("ok username");
     console.log(result);
   } catch (e) {
     console.log(e.message);
     if (e.code == 11000) {
-      console.log(
-        "The userName is a unique index, please add handle of error so that the user knows they need another user name"
-      );
+      console.log("bad username");
+      socket.emit("bad username");
     }
-  } finally {
-    await client.close();
   }
 }
 
@@ -40,24 +39,11 @@ async function checkUsernameExists(user, socket) {
   try {
     console.log("checking " + user);
     await client.connect();
-    let query = { username: user.userName };
-    const result = await client
-      .db("safe_speech")
-      .collection("users")
-      .find(query)
-      .toArray();
-    if (result.length == 0) {
-      addUser(user);
-      console.log("username OK");
-      socket.emit("ok username");
-    } else {
-      console.log("bad username");
-      socket.emit("bad username");
-    }
+    addUser(user, socket);
   } catch (e) {
     console.log(e.message);
   } finally {
-    await client.close();
+    //await client.close();
   }
 }
 
@@ -87,7 +73,7 @@ async function checkLoginCredentials(user, socket) {
   } catch (e) {
     console.log(e.message);
   } finally {
-    await client.close();
+    //await client.close();
   }
 }
 
