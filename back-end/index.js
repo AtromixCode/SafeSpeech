@@ -1,4 +1,5 @@
 require("dotenv").config();
+const bcrypt = require("bcrypt");
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http, {
@@ -37,6 +38,7 @@ async function addUser(user) {
 
 async function checkUsernameExists(user, socket) {
   try {
+    console.log("checking " + user);
     await client.connect();
     let query = { username: user.userName };
     const result = await client
@@ -44,8 +46,8 @@ async function checkUsernameExists(user, socket) {
       .collection("users")
       .find(query)
       .toArray();
-    if (result != undefined) {
-      addUser(credentials);
+    if (result.length == 0) {
+      addUser(user);
       console.log("username OK");
       socket.emit("ok username");
     } else {
@@ -97,7 +99,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("check new login", function (credentials) {
-    console.log("registering");
+    console.log(credentials);
     checkUsernameExists(credentials, socket);
   });
 

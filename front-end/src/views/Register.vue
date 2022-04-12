@@ -182,16 +182,19 @@ export default {
       ) {
         let username = this.input.username;
         let password = this.input.password;
-        let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
-          bcrypt.hash(password, salt, function () {});
+        bcrypt.genSalt(saltRounds, function (err, salt) {
+          bcrypt.hash(password, salt, function (err, salt) {
+            if (err) {
+              console.log(salt);
+              console.log(err);
+            }
+          });
         });
         // store saltedHash and username in DB
         this.$socket.emit("check new login", {
           userName: username,
-          password: saltedHash,
-          pofilePicture: this.selected_avatar,
+          password: password,
         });
-
         // route to chat page
       } else {
         console.log("A username and password must be present");
