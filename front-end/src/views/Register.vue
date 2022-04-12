@@ -175,7 +175,11 @@ export default {
       this.selected_avatar = avatar;
     },
     register() {
-      if (this.input.username != "" && this.input.password != "") {
+      if (
+        this.input.username != "" &&
+        this.input.password != "" &&
+        this.input.password == this.input.password_confirm
+      ) {
         let username = this.input.username;
         let password = this.input.password;
         let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {

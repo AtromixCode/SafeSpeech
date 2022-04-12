@@ -38,7 +38,7 @@ async function addUser(user) {
 async function checkUser(user) {
   try {
     await client.connect();
-    var query = { username: user.userName };
+    let query = { username: user.userName };
     const result = await client
       .db("safe_speech")
       .collection("users")
@@ -56,11 +56,6 @@ async function checkUser(user) {
   }
 }
 
-addUser({
-  userName: "TestUser",
-  password: "Gibberish",
-});
-
 io.on("connection", (socket) => {
   console.log("Connection started");
 
@@ -70,7 +65,7 @@ io.on("connection", (socket) => {
 });
 
 io.on("check new login", function (credentials) {
-  //login
+  console.log("checking login");
   result = checkUser(credentials);
   if (result.length == 0) {
     addUser(credentials);
@@ -86,7 +81,7 @@ io.on("check login credentials", function (credentials) {
   if (result.length == 0) {
     io.emit("bad credentials");
   } else {
-    var hash = result[0].password;
+    let hash = result[0].password;
     bcrypt.compare(saltedHash, hash, function (err, result) {
       if (result) {
         io.emit("login ok", result[0]);
