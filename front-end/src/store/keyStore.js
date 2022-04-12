@@ -1,24 +1,11 @@
 export default {
   namespaced: true,
   state: () => ({
-    keyName: "",
-    key: {},
+    keys: new Map(),
   }),
   mutations: {
-    setKeyName(state, keyName) {
-      state.keyName = keyName;
-    },
-
-    setKey(state, key) {
-      state.key = key;
-    },
-
-    resetKey(state) {
-      state = {
-        keyName: "",
-        key: {},
-      };
-      return state;
+    addKey(state, keyInfo) {
+      state.keys.set(keyInfo.keyName, keyInfo.key);
     },
   },
 };

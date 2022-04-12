@@ -14,7 +14,6 @@ let crypto = window.crypto || window.msCrypto;
 if (!crypto.subtle) {
   alert("Cryptography API not Supported");
 }
-let db = null;
 
 export default {
   name: "HelloWorld",
@@ -29,16 +28,14 @@ export default {
       console.log(msg);
       if (!privateKey) {
         console.log("No private key, trying to find one");
-        privateKey = await this.getKey("privateKey");
-        publicKey = await this.getKey("publicKey");
+        publicKey = this.$store.state.keyStore.keys.get("publicKey");
+        privateKey = this.$store.state.keyStore.keys.get("privateKey");
       }
       if (!privateKey) {
         await this.generateKey();
       }
       console.log("ENCRYPTING AND SENDING MESSAGE");
       const rval = await this.encrypt(msg, publicKey);
-      // console.log(rval.iv);
-      // console.log(rval.encryptedData);
 
       const encMsgObj = {
         encryptedMsg: this.pack(rval.encryptedData),
@@ -62,8 +59,14 @@ export default {
       console.log(keys);
       publicKey = keys.publicKey;
       privateKey = keys.privateKey;
-      await this.updateKey(publicKey, "publicKey");
-      await this.updateKey(privateKey, "privateKey");
+      this.$store.commit("keyStore/addKey", {
+        keyName: "publicKey",
+        key: publicKey,
+      });
+      this.$store.commit("keyStore/addKey", {
+        keyName: "privateKey",
+        key: privateKey,
+      });
       let pubKeyObj = {
         user: user,
         key: await crypto.subtle.exportKey(keyExportFormat, publicKey),
@@ -122,106 +125,6 @@ export default {
       );
       return this.decode(encoded);
     },
-    addKey(key, keyName) {
-      console.log("Adding key " + keyName + " to IndexedDB");
-      let request = db
-        .transaction(["keys"], "readwrite")
-        .objectStore("keys")
-        .add({
-          id: keyName,
-          ar: key,
-        });
-      request.onsuccess = function (event) {
-        console.log(event);
-        console.log("Added key to DB");
-      };
-      request.onerror = function (event) {
-        console.log(event);
-        console.log("Could not add key to DB");
-      };
-    },
-    getDB() {
-      return new Promise(function (resolve) {
-        let indexedDB =
-          window.indexedDB ||
-          window.mozIndexedDB ||
-          window.webkitIndexedDB ||
-          window.msIndexedDB;
-
-        if (!indexedDB) {
-          window.alert(
-            "Your browser doesn't support a stable version of IndexedDB."
-          );
-        }
-        let open = indexedDB.open("SafeSpeechDB", 1);
-
-        open.onerror = function (event) {
-          console.log("error: " + event);
-        };
-
-        open.onsuccess = function () {
-          db = open.result;
-          return resolve();
-        };
-
-        open.onupgradeneeded = function (event) {
-          let db = event.target.result;
-          db.createObjectStore("keys", { keyPath: "id" });
-        };
-      });
-    },
-    getKey(name) {
-      return new Promise((resolve) => {
-        let request = db.transaction(["keys"]).objectStore("keys").get(name);
-        request.onerror = function (event) {
-          console.log(event);
-          console.log("Unable to retrieve data from database!");
-        };
-        request.onsuccess = function (event) {
-          console.log(event);
-          if (request.result) {
-            console.log("Restored key from DB");
-            return resolve(request.result.ar);
-          } else {
-            console.log("Could not retrieve the private key");
-          }
-        };
-      });
-    },
-    removeKey(name) {
-      return new Promise(() => {
-        let request = db
-          .transaction(["keys"], "readwrite")
-          .objectStore("keys")
-          .delete(name);
-        request.onerror = function () {
-          console.log("Unable to remove key from database!");
-        };
-        request.onsuccess = function () {
-          console.log("Removed key");
-        };
-      });
-    },
-    updateKey(newVal, name) {
-      return new Promise(() => {
-        console.log("Updating key");
-        console.log(name);
-        console.log(newVal);
-        let request = db
-          .transaction(["keys"], "readwrite")
-          .objectStore("keys")
-          .put({
-            id: name,
-            ar: newVal,
-          });
-        request.onerror = function () {
-          console.log("Unable to update key in database!");
-        };
-        request.onsuccess = function () {
-          console.log("updated key in indexeddb");
-        };
-      });
-    },
   },
   mounted() {
     this.$socket.on("message", async (obj) => {
@@ -257,16 +160,8 @@ export default {
     });
   },
   created() {
-    const request = { user: user };
-    this.$socket.emit("get pubkey", request);
-    this.getDB().then(() => {
-      this.getKey("publicKey").then((pk) => {
-        publicKey = pk;
-      });
-      this.getKey("privateKey").then((pk) => {
-        privateKey = pk;
-      });
-    });
+    publicKey = this.$store.state.keyStore.keys.get("publicKey");
+    privateKey = this.$store.state.keyStore.keys.get("privateKey");
   },
 };
 function unpack(packed) {
