@@ -24,6 +24,7 @@ const io = require("socket.io")(http, {
     origin: "*",
   },
 });
+const crypto = require("crypto");
 const mongoUser = process.env.MONGO_USER;
 const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
@@ -211,6 +212,8 @@ io.on("connection", (socket) => {
   socket.on("logged in", (username) => {
     console.log(username + " is logged in");
     userSocketIds.set(username, socket.id);
+    // send the keys
+    io.to(socket.id).emit("keys", publicKey, privateKey);
   });
   /**
    * Attempts to register a user with the given credentials.
@@ -229,7 +232,23 @@ io.on("connection", (socket) => {
     }
   });
 });
-
+const {
+  publicKey,
+  privateKey,
+} = crypto.generateKeyPairSync('rsa-pss', {
+  modulusLength: 2048,
+  hashAlgorithm: "sha256",
+  publicKeyEncoding: {
+    type: 'spki',
+    format: 'pem'
+  },
+  privateKeyEncoding: {
+    type: 'pkcs8',
+    format: 'pem',
+  }
+});
+console.log(publicKey);
+console.log(privateKey);
 /**
  * Starts a server at the port
  */

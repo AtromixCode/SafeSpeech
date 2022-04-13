@@ -60,6 +60,7 @@ export default {
   },
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
+    ...mapMutations("keyStore", ["setKeys", "resetState"]),
     sendMessage() {
       console.log("Sending a message " + this.msgInput);
       this.$socket.emit(
@@ -91,6 +92,73 @@ export default {
       return this.user.chats.findIndex((chat) => {
         return chat._id === chatId;
       });
+    },
+    // following functions from webcryptoapi docs
+    str2ab(str) {
+      const buf = new ArrayBuffer(str.length);
+      const bufView = new Uint8Array(buf);
+      for (let i = 0, strLen = str.length; i < strLen; i++) {
+        bufView[i] = str.charCodeAt(i);
+      }
+      return buf;
+    },
+    async importPublicKey(publicKey) {
+      console.log(publicKey);
+      const testPubKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy3Xo3U13dc+xojwQYWoJLCbOQ5fOVY8LlnqcJm1W1BFtxIhOAJWohiHuIRMctv7dzx47TLlmARSKvTRjd0dF92jx/xY20Lz+DXp8YL5yUWAFgA3XkO3LSJgEOex10NB8jfkmgSb7QIudTVvbbUDfd5fwIBmCtaCwWx7NyeWWDb7A9cFxj7EjRdrDaK3ux/ToMLHFXVLqSL341TkCf4ZQoz96RFPUGPPLOfvN0x66CM1PQCkdhzjE6U5XGE964ZkkYUPPsy6Dcie4obhW4vDjgUmLzv0z7UD010RLIneUgDE2FqBfY/C+uWigNPBPkkQ+Bv/UigS6dHqTCVeD5wgyBQIDAQAB
+-----END PUBLIC KEY-----`;
+      publicKey = testPubKey;
+      // fetch the part of the PEM string between header and footer
+      const pemHeader = "-----BEGIN PUBLIC KEY-----";
+      const pemFooter = "-----END PUBLIC KEY-----";
+      const pemContents = publicKey.substring(
+        pemHeader.length,
+        publicKey.length - pemFooter.length
+      );
+      // base64 decode the string to get the binary data
+      const binaryDerString = window.atob(pemContents);
+      console.log(binaryDerString);
+      // convert from a binary string to an ArrayBuffer
+      const buf = new ArrayBuffer(binaryDerString.length);
+      const bufView = new Uint8Array(buf);
+      for (let i = 0, strLen = binaryDerString.length; i < strLen; i++) {
+        bufView[i] = binaryDerString.charCodeAt(i);
+      }
+      return await window.crypto.subtle.importKey(
+        "spki",
+        buf,
+        {
+          name: "RSA-PSS",
+          hash: "SHA-256",
+        },
+        true,
+        ["encrypt"]
+      );
+    },
+    async importPrivateKey(privateKey) {
+      console.log(privateKey);
+      // const pemHeader = "-----BEGIN PRIVATE KEY-----";
+      // const pemFooter = "-----END PRIVATE KEY-----";
+      // const pemContents = privateKey.substring(
+      //   pemHeader.length,
+      //   privateKey.length - pemFooter.length
+      // );
+      // console.log(pemContents);
+      // base64 decode the string to get the binary data
+      // const binaryDerString = window.atob(pemContents);
+      // convert from a binary string to an ArrayBuffer
+      // const binaryDer = this.str2ab(binaryDerString);
+      //
+      // return await window.crypto.subtle.importKey(
+      //   "pkcs8",
+      //   binaryDer,
+      //   {
+      //     name: "RSA-PSS",
+      //     hash: "SHA-256",
+      //   },
+      //   true,
+      //   ["decrypt"]
+      // );
     },
   },
   created() {
@@ -130,7 +198,16 @@ export default {
         this.$socket.emit("logged in", this.$store.state.user.username);
       }
     });
-
+    this.$socket.on("keys", (publicKey, privateKey) => {
+      let keyInfo = {
+        publicKey: this.importPublicKey(publicKey),
+        privateKey: this.importPrivateKey(privateKey),
+      };
+      console.log("Setting keys");
+      this.setKeys(keyInfo);
+      console.log(this.$store.state.keyStore.publicKey);
+      console.log(this.$store.state.keyStore.privateKey);
+    });
     bus.$on("chat-click", (chatId) => {
       if (this.currentChat != chatId) {
         this.currentChat = chatId;
