@@ -37,7 +37,6 @@ export default {
       this.messages = [];
       let localChats = [];
       localChats = this.user.chats;
-      console.log(localChats[0].messages[0].timeStamp);
       this.messages = localChats.find(isCurrentChat).messages;
     },
   },

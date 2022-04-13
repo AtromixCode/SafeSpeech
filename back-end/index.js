@@ -12,8 +12,8 @@ const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
 let userKeys = new Map();
 let userSocketIds = new Map();
-const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
-const {json} = require("express");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { json } = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 const today = new Date();
@@ -98,12 +98,6 @@ async function checkUsernameExists(user, socket) {
     //await client.close();
   }
 }
-<<<<<<< HEAD
-const today = new Date();
-const tomorrow = new Date();
-
-=======
->>>>>>> JDEncryptedChat
 async function checkLoginCredentials(user, socket) {
   try {
     await client.connect();
@@ -146,18 +140,17 @@ async function checkLoginCredentials(user, socket) {
     //await client.close();
   }
 }
-<<<<<<< HEAD
-=======
-async function createChat(chatTitle, messages, participants){
+async function createChat(chatTitle, messages, participants) {
   try {
     await client.connect();
     const result = await client
-        .db("safe_speech")
-        .collection("chats").insertOne({
-          chatTitle: chatTitle,
-          messages: messages,
-          participants: participants
-        })
+      .db("safe_speech")
+      .collection("chats")
+      .insertOne({
+        chatTitle: chatTitle,
+        messages: messages,
+        participants: participants,
+      });
     console.log(result);
   } catch (e) {
     console.log(e.message);
@@ -166,32 +159,35 @@ async function createChat(chatTitle, messages, participants){
   }
 }
 
-async function getUserChats(username){
+async function getUserChats(username) {
   await client.connect();
-  let query = {participants: {username: username}};
-  const cursor = await client
-      .db("safe_speech")
-      .collection("chats")
-      .find(query);
+  let query = { participants: { username: username } };
+  const cursor = await client.db("safe_speech").collection("chats").find(query);
   return await cursor.toArray();
 }
-async function getChat(chatId){
+async function getChat(chatId) {
   await client.connect();
-  let query = {_id: chatId};
-  return await client
-      .db("safe_speech")
-      .collection("chats")
-      .findOne(query);
+  let query = { _id: chatId };
+  return await client.db("safe_speech").collection("chats").findOne(query);
 }
-async function addMessageToChat(content, sender, chatId){
+async function addMessageToChat(content, sender, chatId) {
   try {
     await client.connect();
     const result = await client
-        .db("safe_speech")
-        .collection("chats").updateOne(
-            {_id: chatId},
-            { "$push": {messages: {content:content, username:sender, timestamp:new Date()} }}
-        );
+      .db("safe_speech")
+      .collection("chats")
+      .updateOne(
+        { _id: chatId },
+        {
+          $push: {
+            messages: {
+              content: content,
+              username: sender,
+              timestamp: new Date(),
+            },
+          },
+        }
+      );
     console.log(result);
   } catch (e) {
     console.log(e.message);
@@ -199,7 +195,6 @@ async function addMessageToChat(content, sender, chatId){
     await client.close();
   }
 }
->>>>>>> JDEncryptedChat
 
 io.on("connection", (socket) => {
   console.log("Connection started");
@@ -210,29 +205,29 @@ io.on("connection", (socket) => {
   });
   socket.on("create chat", async (chatTitle, messages, users) => {
     await createChat(chatTitle, messages, users);
-  })
+  });
   socket.on("add message to chat", async (content, sender, chatId) => {
     // assuming you get just the string otherwise ObjectId not necessary
     await addMessageToChat(content, sender, ObjectId(chatId));
     // send message to all participants
     const chat = getChat(ObjectId(chatId));
     const users = chat.participants;
-    users.forEach((user)=>{
+    users.forEach((user) => {
       let socketId = userSocketIds.get(user.username);
-      if(socketId){
-        io.to(socketId).emit("message", content)
+      if (socketId) {
+        io.to(socketId).emit("message", content);
       }
     });
   });
 
-  socket.on("set pubkey", (obj)=>{
+  socket.on("set pubkey", (obj) => {
     console.log(obj);
     userKeys.set(obj.user, obj.key);
     console.log(userKeys.get(obj.user));
   });
-  socket.on("get pubkey", (obj)=>{
-    console.log("Pub key request for "+obj.user);
-    let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
+  socket.on("get pubkey", (obj) => {
+    console.log("Pub key request for " + obj.user);
+    let pubKey = { user: obj.user, pubKey: userKeys.get(obj.user) };
     console.log(pubKey);
     io.to(socket.id).emit("pubkey", pubKey);
   });

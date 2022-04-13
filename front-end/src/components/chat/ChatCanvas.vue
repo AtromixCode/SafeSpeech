@@ -31,7 +31,6 @@
 
 <script>
 import ChatOptions from "./ChatOptions.vue";
-import { bus } from "@/main.js";
 import MessageList from "./MessageList.vue";
 export default {
   components: { ChatOptions, MessageList },
@@ -48,15 +47,13 @@ export default {
       let payload = {
         content: this.msgInput,
         chatId: this.currentChat,
-        from: this.$store.state.user.userName,
+        username: this.$store.state.user.userName,
       };
       this.$socket.emit("message", payload);
+      this.msgInput = "";
     },
   },
   mounted() {
-    bus.$on("test", (data) => {
-      console.log(data);
-    });
     this.$socket.on("message", (payload) => {
       // TODO display
       console.log(payload);
