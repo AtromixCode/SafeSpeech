@@ -3,16 +3,17 @@
     <nav>
       <ul>
         <b-button
-          v-for="chat in buttons"
-          v-bind:pressed="chat.highlighted"
-          :key="chat.id"
-          :id="chat.id"
-          @click="onClick(chat.id)"
+          v-b-toggle.sidebar-1
+          v-for="chat in user.chats"
+          v-bind:pressed="chat._id === currentChat"
+          :key="chat._id"
+          :id="chat._id"
+          @click="onClick(chat._id)"
           squared
           variant="none"
           class="chat-button"
         >
-          {{ chat.title }}
+          {{ chat.chatTitle }}
         </b-button>
       </ul>
     </nav>
@@ -20,14 +21,18 @@
 </template>
 
 <script>
+import { bus } from "@/main.js";
+import { mapState } from "vuex";
 export default {
   name: "ChatList",
-  props: ["buttonList"],
   data() {
-    return { buttons: this.buttonList };
+    return {
+      currentChat: "",
+    };
   },
-  mounted() {
-    this.buttons[0].highlighted = true;
+
+  computed: {
+    ...mapState({ user: (state) => state.user }),
   },
   methods: {
     onClick(chatId) {
@@ -42,6 +47,9 @@ export default {
       });
 
       this.buttons.find(isClickedButton).highlighted = true;
+      bus.$emit("chat-click", chatId);
+      bus.$emit("chat-click", chatId);
+      this.$forceUpdate();
     },
   },
 };

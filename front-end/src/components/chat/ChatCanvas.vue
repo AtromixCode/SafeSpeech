@@ -5,11 +5,16 @@
         <chat-options class="chat-options" style="float: right" />
       </div>
     </b-row>
-    <b-row class="chat-display">
-      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">
-        {{ msg.content }} - {{ idx }}
-      </li>
-    </b-row>
+<!--    <b-row class="chat-display">-->
+<!--      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">-->
+<!--        {{ msg.content }} - {{ idx }}-->
+<!--      </li>-->
+<!--    </b-row>-->
+    <b-row
+      ><div class="header">
+        <chat-options class="chat-options" style="float: right" /></div
+    ></b-row>
+    <b-row class="chat-display"><message-list /></b-row>
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -35,12 +40,14 @@
 </template>
 
 <script>
+import { bus } from "@/main.js";
 import ChatOptions from "./ChatOptions.vue";
+import MessageList from "./MessageList.vue";
 import { mapMutations, mapState } from "vuex";
 
 export default {
   name: "ChatCanvas",
-  components: { ChatOptions },
+  components: { ChatOptions, MessageList },
   data() {
     return {
       msgInput: "",
@@ -123,11 +130,27 @@ export default {
         this.$socket.emit("logged in", this.$store.state.user.username);
       }
     });
+
+    bus.$on("chat-click", (chatId) => {
+      if (this.currentChat != chatId) {
+        this.currentChat = chatId;
+      }
+    });
   },
 };
 </script>
 
 <style scoped>
+nav ul {
+  height: 85vh;
+  width: 100%;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding: 0;
+}
+ul::-webkit-scrollbar {
+  display: none;
+}
 .header {
   display: block;
   padding: 0;

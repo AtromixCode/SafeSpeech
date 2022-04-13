@@ -50,7 +50,6 @@
       <img src="../assets/rightCircle.svg" class="bottomright" />
 
       <Teleport to="body">
-        <!-- use the modal component, pass in the prop -->
         <modal
           :show="showModal"
           @close="showModal = false"
@@ -102,9 +101,7 @@
             <button type="button" class="btn btn-dark" v-on:click="register()">
               Register
             </button>
-            <button type="button" class="btn btn-light" v-on:click="register()">
-              Cancel
-            </button>
+            <button type="button" class="btn btn-light">Cancel</button>
           </div>
         </div>
         <div class="col"><img src="../assets/Mobile.svg" height="220vh" /></div>
