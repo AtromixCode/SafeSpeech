@@ -11,6 +11,7 @@ const mongoUser = process.env.MONGO_USER;
 const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
 let userKeys = new Map();
+let userSocketIds = new Map();
 const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
 const {json} = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -31,6 +32,7 @@ async function addUser(user, socket) {
 
     console.log("username OK");
     socket.emit("ok username");
+    userSocketIds.set(user.userName, socket.id);
     console.log(result);
   } catch (e) {
     console.log(e.message);
@@ -42,49 +44,49 @@ async function addUser(user, socket) {
     }
   }
 }
-async function addMessage(userName, message, chatId) {
-  try {
-    await client.connect();
-
-    const result = await client
-        .db("safe_speech")
-        .collection("chats").insertOne({
-
-          timeStamp: today,
-          content: message,
-          from: userName,
-          chatId: chatId
-        })
-    // .insertOne({
-    //   messages: [
-    //     {
-    //       timeStamp: today,
-    //       content: "This is a message",
-    //       from: "AnoterUserName",
-    //     },
-    //     {
-    //       timeStamp: tomorrow,
-    //       content: "This is a message",
-    //       from: "TestUsername",
-    //     },
-    //   ],
-    //   title: "Example title",
-    //   members: ["AnoterUserName", "TestUsername"],
-    //   lastUpdated: today,
-    // });
-
-    console.log(result);
-  } catch (e) {
-    console.log(e.message);
-    if (e.code == 11000) {
-      console.log(
-          "The userName is a unique index, please add handle of error so that the user knows they need another user name"
-      );
-    }
-  } finally {
-    await client.close();
-  }
-}
+// async function addMessage(userName, message, chatId) {
+//   try {
+//     await client.connect();
+//
+//     const result = await client
+//         .db("safe_speech")
+//         .collection("chats").insertOne({
+//
+//           timeStamp: today,
+//           content: message,
+//           from: userName,
+//           chatId: chatId
+//         })
+//     // .insertOne({
+//     //   messages: [
+//     //     {
+//     //       timeStamp: today,
+//     //       content: "This is a message",
+//     //       from: "AnoterUserName",
+//     //     },
+//     //     {
+//     //       timeStamp: tomorrow,
+//     //       content: "This is a message",
+//     //       from: "TestUsername",
+//     //     },
+//     //   ],
+//     //   title: "Example title",
+//     //   members: ["AnoterUserName", "TestUsername"],
+//     //   lastUpdated: today,
+//     // });
+//
+//     console.log(result);
+//   } catch (e) {
+//     console.log(e.message);
+//     if (e.code == 11000) {
+//       console.log(
+//           "The userName is a unique index, please add handle of error so that the user knows they need another user name"
+//       );
+//     }
+//   } finally {
+//     await client.close();
+//   }
+// }
 async function checkUsernameExists(user, socket) {
   try {
     console.log("checking " + user);
@@ -127,6 +129,7 @@ async function checkLoginCredentials(user, socket) {
         result.userName == user.userName
       ) {
         socket.emit("login ok", result[0]);
+        userSocketIds.set(user.userName, socket.id);
       } else {
         socket.emit("bad credentials");
       }
@@ -155,7 +158,7 @@ async function createChat(chatTitle, messages, participants){
   }
 }
 
-async function getChats(username){
+async function getUserChats(username){
   await client.connect();
   let query = {participants: {username: username}};
   const cursor = await client
@@ -164,7 +167,14 @@ async function getChats(username){
       .find(query);
   return await cursor.toArray();
 }
-
+async function getChat(chatId){
+  await client.connect();
+  let query = {_id: chatId};
+  return await client
+      .db("safe_speech")
+      .collection("chats")
+      .findOne(query);
+}
 async function addMessageToChat(content, sender, chatId){
   try {
     await client.connect();
@@ -184,18 +194,10 @@ async function addMessageToChat(content, sender, chatId){
 
 io.on("connection", (socket) => {
   console.log("Connection started");
-  // TODO add user to all relevant rooms
-  socket.on("message", (obj) => {
-    console.log(obj);
-    // TODO save message into DB
-    addMessage(obj.from, obj.content, obj.chatId)
-    // TODO send message to all users in the room
-    io.emit("message", obj);
-    // io.to(socket.id).emit("message", obj);
-  });
+  // TODO on disconnect remove socket from map
 
   socket.on("get chats", async (userName) => {
-    io.to(socket.id).emit("user chats", await getChats(userName));
+    io.to(socket.id).emit("user chats", await getUserChats(userName));
   });
   socket.on("create chat", async (chatTitle, messages, users) => {
     await createChat(chatTitle, messages, users);
@@ -203,7 +205,15 @@ io.on("connection", (socket) => {
   socket.on("add message to chat", async (content, sender, chatId) => {
     // assuming you get just the string otherwise ObjectId not necessary
     await addMessageToChat(content, sender, ObjectId(chatId));
-
+    // send message to all participants
+    const chat = getChat(ObjectId(chatId));
+    const users = chat.participants;
+    users.forEach((user)=>{
+      let socketId = userSocketIds.get(user.username);
+      if(socketId){
+        io.to(socketId).emit("message", content)
+      }
+    });
   });
 
   socket.on("set pubkey", (obj)=>{
