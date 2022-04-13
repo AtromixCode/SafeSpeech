@@ -1,5 +1,8 @@
 require("dotenv").config();
-const bcrypt = require("bcrypt");
+/*
+
+ */
+
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http, {
@@ -16,11 +19,8 @@ const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
 const {json} = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
-const today = new Date();
-const tomorrow = new Date();
-// Add 1 Day
-tomorrow.setDate(today.getDate() + 2);
 
+/**/
 async function addUser(user) {
   try {
     await client.connect();
@@ -151,7 +151,10 @@ http.listen(port, () => {
 });
 
 //TESTS
-//
+//const today = new Date();
+// const tomorrow = new Date();
+// // Add 1 Day
+// tomorrow.setDate(today.getDate() + 2);
 // createChat("Test", [
 //   {content: "message1", username: "charlie", timestamp: today},
 //   {content: "message2", username: "bob", timestamp: tomorrow},
