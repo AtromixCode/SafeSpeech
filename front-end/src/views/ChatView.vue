@@ -15,7 +15,12 @@ export default {
   name: "ChatView",
 
   computed: { ...mapState({ user: (state) => state.user }) },
-  methods: { ...mapMutations("user", ["setUserName", "resetUserInfo"]) },
+  methods: {
+    ...mapMutations("user", ["setUserName", "setUserInfo", "resetUserInfo"]),
+  },
+  created() {},
+
+  mounted() {},
 };
 </script>
 

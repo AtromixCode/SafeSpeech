@@ -1,21 +1,19 @@
 export default {
   namespaced: true,
-
   state: () => ({
     username: "",
-    _id: "",
     chats: [
       {
-        messages: [{ content: "", username: "", timestamp: Date }],
-        _id: "",
+        messages: [{ timeStamp: "", content: "", username: "" }],
+        participants: [{ username: "" }],
         chatTitle: "",
-        participants: [],
+        _id: "",
       },
     ],
   }),
   mutations: {
-    setUserName(state, userName) {
-      state.username = userName;
+    setUserName(state, username) {
+      state.username = username;
     },
 
     setUserInfo(state, userInfo) {
@@ -26,21 +24,21 @@ export default {
     },
 
     resetUserInfo(state) {
-      console.log("doing something");
       let emptyState = {
         userName: "",
-        _id: "",
+        userId: "",
         chats: [
           {
-            messages: [{ content: "", username: "", timestamp: Date }],
-            _id: "",
-            chatTitle: "",
-            participants: [],
+            messages: [{ timeStamp: "", content: "", from: "" }],
+            lastUpdated: "",
+            title: "",
+            members: "",
           },
         ],
       };
-      this.$store.replaceState(emptyState);
-      return state;
+      Object.entries(emptyState).forEach(([k, v]) => {
+        state[k] = v;
+      });
     },
   },
 };
