@@ -38,13 +38,13 @@
           >
           <b-row>
             <b-col md="auto">
-              <b-button
-                v-b-modal.modal
-                style="color: white; font-size: 1.25rem"
-                variant="something"
-                aria-label="logout"
-              >
+              <b-button v-b-modal.modal variant="something">
                 <img src="../../assets/NewUser.svg" />
+              </b-button>
+            </b-col>
+            <b-col md="auto">
+              <b-button v-b-modal.modal-1 variant="something">
+                <img src="../../assets/GroupChat.svg" />
               </b-button>
             </b-col>
           </b-row>
@@ -80,6 +80,48 @@
         </b-button>
       </div>
     </b-modal>
+
+    <b-modal id="modal-1" title="BootstrapVue" hide-footer>
+      <h1>Groupchat Settings</h1>
+      <div class="form-control">
+        Chat Name
+        <input type="text" placeholder="New name" v-model="input.chatName" />
+        <b-button
+          v-b-modal.modal-1
+          variant="something"
+          v-on:click="addUserToGroupChatList()"
+        >
+          <img src="../../assets/addUser.svg" />
+        </b-button>
+        <input
+          type="text"
+          style="width: 50%"
+          placeholder="Friend's username"
+          v-model="input.groupChat_friends_username"
+        />
+        <ul>
+          <li v-for="item in groupChatUsers" :key="item">{{ item }}</li>
+        </ul>
+      </div>
+      <div class="col-md-12 text-center">
+        <b-button
+          type="button"
+          class="btn btn-dark"
+          block
+          v-on:click="createGroupChat()"
+        >
+          Accept Changes
+        </b-button>
+        <b-button
+          type="button"
+          class="btn btn-light"
+          block
+          @click="$bvModal.hide('modal-1')"
+        >
+          Cancel
+        </b-button>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -95,6 +137,7 @@ export default {
       input: {
         username: "",
       },
+      groupChatUsers: [],
     };
   },
   computed: {
@@ -118,10 +161,34 @@ export default {
         this.$bvModal.hide("modal");
       }
     },
-    closeModal() {
-      this.$bvModal.hide("modal");
-      console.log("close the fuckin thing");
+    createGroupChat() {
+      this.groupChatUsers.push(this.user.username);
+      this.$socket.emit(
+        "create chat",
+        this.input.chatName,
+        [],
+        this.groupChatUsers
+      );
+
+      this.input.groupChat_friends_username = "";
+      this.groupChatUsers = [];
+      this.$bvModal.hide("modal-1");
     },
+    addUserToGroupChatList() {
+      //add the username to groupChatUsers
+      if (this.input.groupChat_friends_username != "") {
+        this.groupChatUsers.push(this.input.groupChat_friends_username);
+        this.input.groupChat_friends_username = "";
+      }
+    },
+  },
+  mounted() {
+    /**
+     * server oks the username, thus go to the chat page
+     */
+    this.$socket.on("ok username", () => {
+      this.goToChat();
+    });
   },
 };
 </script>
