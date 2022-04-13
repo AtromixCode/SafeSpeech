@@ -64,10 +64,18 @@ export default {
       }
     },
     updateUIWithChatMessages() {
-      const curChat = this.user.chats.find((chat) => {
-        return chat._id === this.currentChatId;
-      });
+      const curChat = this.getChatInfo(this.currentChatId);
       curChat.messages.forEach(this.addMessageToUI);
+    },
+    getChatInfo(chatId) {
+      return this.user.chats.find((chat) => {
+        return chat._id === chatId;
+      });
+    },
+    getChatIdx(chatId) {
+      return this.user.chats.findIndex((chat) => {
+        return chat._id === chatId;
+      });
     },
   },
   created() {
@@ -88,8 +96,14 @@ export default {
       this.updateUIWithChatMessages();
     });
     this.$socket.on("message", (msgPayload, chatId) => {
-      // add to store
       console.log("Received message from server");
+      // add to store
+      const userInfo = this.user;
+      let updatedChatIdx = this.getChatIdx(chatId);
+      userInfo.chats[updatedChatIdx].messages[
+        userInfo.chats[updatedChatIdx].messages.length
+      ] = msgPayload;
+      this.setUserInfo(userInfo);
       if (chatId === this.currentChatId) {
         // add to UI
         this.addMessageToUI(msgPayload);
