@@ -11,7 +11,7 @@ const mongoUser = process.env.MONGO_USER;
 const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
 let userKeys = new Map();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
 const {json} = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
@@ -150,11 +150,6 @@ async function createChat(chatTitle, messages, participants){
     console.log(result);
   } catch (e) {
     console.log(e.message);
-    if (e.code === 11000) {
-      console.log(
-          "The userName is a unique index, please add handle of error so that the user knows they need another user name"
-      );
-    }
   } finally {
     await client.close();
   }
@@ -168,6 +163,23 @@ async function getChats(username){
       .collection("chats")
       .find(query);
   return await cursor.toArray();
+}
+
+async function addMessageToChat(content, sender, chatId){
+  try {
+    await client.connect();
+    const result = await client
+        .db("safe_speech")
+        .collection("chats").updateOne(
+            {_id: chatId},
+            { "$push": {messages: {content:content, username:sender, timestamp:new Date()} }}
+        );
+    console.log(result);
+  } catch (e) {
+    console.log(e.message);
+  } finally {
+    await client.close();
+  }
 }
 
 io.on("connection", (socket) => {
@@ -188,6 +200,11 @@ io.on("connection", (socket) => {
   socket.on("create chat", async (chatTitle, messages, users) => {
     await createChat(chatTitle, messages, users);
   })
+  socket.on("add message to chat", async (content, sender, chatId) => {
+    // assuming you get just the string otherwise ObjectId not necessary
+    await addMessageToChat(content, sender, ObjectId(chatId));
+
+  });
 
   socket.on("set pubkey", (obj)=>{
     console.log(obj);
@@ -224,3 +241,5 @@ http.listen(port, () => {
 // ], [{username: "charlie"}, {username: "bob"}])
 //
 // console.log(getChats("bob"));
+//
+// addMessageToChat("Message 3", "bob", ObjectId("6256227058e97bee48b8c1cf"));
