@@ -11,9 +11,15 @@
           <b-form-input
             placeholder="Enter a message 😎"
             class="input-text"
+            v-model="msgInput"
           ></b-form-input>
           <b-input-group-append>
-            <b-button pill variant="dark" class="mx-2 px-4 send-button">
+            <b-button
+              @click="sendMessage"
+              pill
+              variant="dark"
+              class="mx-2 px-4 send-button"
+            >
               <b-icon icon="cursor" />
             </b-button>
           </b-input-group-append>
@@ -30,9 +36,30 @@ import MessageList from "./MessageList.vue";
 export default {
   components: { ChatOptions, MessageList },
   name: "ChatCanvas",
+
+  data() {
+    return {
+      msgInput: "",
+      currentChat: "testChat",
+    };
+  },
+  methods: {
+    sendMessage() {
+      let payload = {
+        content: this.msgInput,
+        chatId: this.currentChat,
+        from: this.$store.state.user.userName,
+      };
+      this.$socket.emit("message", payload);
+    },
+  },
   mounted() {
     bus.$on("test", (data) => {
       console.log(data);
+    });
+    this.$socket.on("message", (payload) => {
+      // TODO display
+      console.log(payload);
     });
   },
 };
