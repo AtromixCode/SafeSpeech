@@ -31,7 +31,9 @@
 
 <script>
 import ChatOptions from "./ChatOptions.vue";
+import { mapMutations, mapState } from "vuex";
 export default {
+  name: "ChatCanvas",
   components: { ChatOptions },
   data() {
     return {
@@ -39,8 +41,9 @@ export default {
       currentChat: "testChat",
     };
   },
-  name: "ChatCanvas",
+  computed: { ...mapState({ user: (state) => state.user }) },
   methods: {
+    ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
       let payload = {
         content: this.msgInput,
@@ -50,10 +53,21 @@ export default {
       this.$socket.emit("message", payload);
     },
   },
+  created() {
+    // hardcode a username in store
+    this.setUserName("bob");
+    // retrieve chats
+    this.$socket.emit("get chats", this.$store.state.user.username);
+  },
   mounted() {
-    this.$socket.on("message", (payload) => {
-      // TODO display
+    this.$socket.on("user chats", (chats) => {
+      let payload = {
+        username: this.$store.state.user.username,
+        chats: chats,
+      };
+      this.setUserInfo(payload);
       console.log(payload);
+      console.log(this.user);
     });
   },
 };
