@@ -33,13 +33,53 @@
           </b-row>
           <b-row
             ><span style="float: center" class="user-info">{{
-              user.userName
+              user.username
             }}</span></b-row
           >
+          <b-row>
+            <b-col md="auto">
+              <b-button
+                v-b-modal.modal
+                style="color: white; font-size: 1.25rem"
+                variant="something"
+                aria-label="logout"
+              >
+                <img src="../../assets/NewUser.svg" />
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
         <chat-list :buttonList="buttons" />
       </template>
     </b-sidebar>
+
+    <b-modal id="modal" title="BootstrapVue" hide-footer>
+      <div class="form-control">
+        <input
+          type="text"
+          placeholder="Friend's Username"
+          v-model="input.friends_username"
+        />
+      </div>
+      <div class="col-md-12 text-center">
+        <b-button
+          type="button"
+          class="btn btn-dark"
+          block
+          v-on:click="createNewChat()"
+        >
+          Add
+        </b-button>
+        <b-button
+          type="button"
+          class="btn btn-light"
+          block
+          @click="$bvModal.hide('modal')"
+        >
+          Cancel
+        </b-button>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -50,14 +90,37 @@ import ChatList from "./ChatList.vue";
 export default {
   components: { ChatOptions, ChatList },
   name: "SideBar",
-
+  data() {
+    return {
+      input: {
+        username: "",
+      },
+    };
+  },
   computed: {
     ...mapState({ user: (state) => state.user }),
     buttons() {
       let buttonProperties = this.user.chats.map((el) => {
-        return { id: el._id, title: el.title, highlighted: false };
+        return { id: el._id, title: el.chatTitle, highlighted: false };
       });
       return buttonProperties;
+    },
+  },
+  methods: {
+    createNewChat() {
+      if (this.input.friends_username != "") {
+        this.$socket.emit(
+          "create chat",
+          "",
+          [],
+          [this.user.username, this.input.friends_username]
+        );
+        this.$bvModal.hide("modal");
+      }
+    },
+    closeModal() {
+      this.$bvModal.hide("modal");
+      console.log("close the fuckin thing");
     },
   },
 };
@@ -89,6 +152,10 @@ export default {
 
 div {
   color: white;
+}
+
+button {
+  display: inline-block;
 }
 
 .header {

@@ -5,6 +5,7 @@ import store from "./store";
 import socket from "./socket";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue/dist/bootstrap-vue.css";
+export const bus = new Vue();
 
 Vue.config.productionTip = false;
 Vue.prototype.$socket = socket;

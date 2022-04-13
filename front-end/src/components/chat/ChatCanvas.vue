@@ -1,11 +1,19 @@
 <template>
   <b-container>
+<<<<<<< HEAD
     <b-row>
       <div class="header">
         <chat-options class="chat-options" style="float: right" />
       </div>
     </b-row>
     <b-row class="chat-display"></b-row>
+=======
+    <b-row
+      ><div class="header">
+        <chat-options class="chat-options" style="float: right" /></div
+    ></b-row>
+    <b-row class="chat-display"><message-list /></b-row>
+>>>>>>> victor/chat
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -31,7 +39,9 @@
 </template>
 
 <script>
+import { bus } from "@/main.js";
 import ChatOptions from "./ChatOptions.vue";
+<<<<<<< HEAD
 import { mapMutations, mapState } from "vuex";
 
 export default {
@@ -44,9 +54,23 @@ export default {
     };
   },
   computed: { ...mapState({ user: (state) => state.user }) },
+=======
+import MessageList from "./MessageList.vue";
+export default {
+  components: { ChatOptions, MessageList },
+  name: "ChatCanvas",
+
+  data() {
+    return {
+      msgInput: "",
+      currentChat: "",
+    };
+  },
+>>>>>>> victor/chat
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
+<<<<<<< HEAD
       console.log("Sending a message " + this.msgInput);
       this.$socket.emit(
         "add message to chat",
@@ -76,6 +100,15 @@ export default {
       return this.user.chats.findIndex((chat) => {
         return chat._id === chatId;
       });
+=======
+      let payload = {
+        content: this.msgInput,
+        chatId: this.currentChat,
+        username: this.$store.state.user.userName,
+      };
+      this.$socket.emit("add message to chat", payload);
+      this.msgInput = "";
+>>>>>>> victor/chat
     },
   },
   created() {
@@ -85,6 +118,7 @@ export default {
     this.$socket.emit("get chats", this.$store.state.user.username);
   },
   mounted() {
+<<<<<<< HEAD
     this.$socket.on("user chats", (chats) => {
       let payload = {
         username: this.$store.state.user.username,
@@ -113,12 +147,33 @@ export default {
       if (this.$store.state.user.username) {
         this.$socket.emit("logged in", this.$store.state.user.username);
       }
+=======
+    this.$socket.on("add message to chat", (payload) => {
+      // TODO display
+      console.log(payload);
+>>>>>>> victor/chat
+    });
+
+    bus.$on("chat-click", (chatId) => {
+      if (this.currentChat != chatId) {
+        this.currentChat = chatId;
+      }
     });
   },
 };
 </script>
 
 <style scoped>
+nav ul {
+  height: 85vh;
+  width: 100%;
+  overflow: hidden;
+  overflow-y: scroll;
+  padding: 0;
+}
+ul::-webkit-scrollbar {
+  display: none;
+}
 .header {
   display: block;
   padding: 0;
