@@ -47,32 +47,31 @@ export default {
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
-      let payload = {
-        content: this.msgInput,
-        chatId: this.currentChatId,
-        from: this.$store.state.user.userName,
-      };
-      this.$socket.emit("message", payload);
+      console.log("Sending a message " + this.msgInput);
+      this.$socket.emit(
+        "add message to chat",
+        this.msgInput,
+        this.$store.state.user.userName,
+        this.currentChatId
+      );
     },
     addMessageToUI(msg) {
       // TODO add to the UI
-      console.log(msg.content);
       if (msg.username === this.$store.state.user.username) {
-        console.log("from ME");
+        console.log("from ME:" + msg.content);
       } else {
-        console.log(msg.username);
+        console.log("from " + msg.username + ": " + msg.content);
       }
     },
     updateUIWithChatMessages() {
       const curChat = this.user.chats.find((chat) => {
         return chat._id === this.currentChatId;
       });
-      // console.log(curChat);
       curChat.messages.forEach(this.addMessageToUI);
     },
   },
   created() {
-    // hardcode a username in store
+    // TODO un hardcode a username in store
     this.setUserName("bob");
     // retrieve chats
     this.$socket.emit("get chats", this.$store.state.user.username);
@@ -87,6 +86,19 @@ export default {
       this.currentChatId = chats[0]._id;
       // update ui
       this.updateUIWithChatMessages();
+    });
+    this.$socket.on("message", (msgPayload, chatId) => {
+      // add to store
+      console.log("Received message from server");
+      if (chatId === this.currentChatId) {
+        // add to UI
+        this.addMessageToUI(msgPayload);
+      }
+    });
+    this.$socket.on("get username", () => {
+      if (this.$store.state.user.username) {
+        this.$socket.emit("logged in", this.$store.state.user.username);
+      }
     });
   },
 };

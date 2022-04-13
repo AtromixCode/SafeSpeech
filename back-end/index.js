@@ -83,14 +83,14 @@ async function createChat(chatTitle, messages, participants){
  * @param chatId the chat ID to which this message will be appended
  * @returns nothing.
  */
-async function addMessageToChat(content, sender, chatId){
+async function addMessageToChat(msgPayload, chatId){
   try {
     await client.connect();
     const result = await client
         .db("safe_speech")
         .collection("chats").updateOne(
             {_id: chatId},
-            { "$push": {messages: {content:content, username:sender, timestamp:new Date()} }}
+            { "$push": {messages: msgPayload }}
         );
     console.log(result);
   } catch (e) {
@@ -148,6 +148,8 @@ async function getChat(chatId){
  */
 io.on("connection", (socket) => {
   console.log("Connection started");
+  // ask user username in case the socket knows its username
+  io.to(socket.id).emit("get username");
   // TODO on disconnect remove socket from map
   /**
    * Retrieves user with specified username and sends it to the requesting socket.
@@ -172,14 +174,17 @@ io.on("connection", (socket) => {
    */
   socket.on("add message to chat", async (content, sender, chatId) => {
     // assuming you get just the string otherwise ObjectId not necessary
-    await addMessageToChat(content, sender, ObjectId(chatId));
+    let msgPayload = {content:content, username:sender, timestamp:new Date()};
+    await addMessageToChat(msgPayload, ObjectId(chatId));
     // send message to all participants
-    const chat = getChat(ObjectId(chatId));
+    const chat = await getChat(ObjectId(chatId));
     const users = chat.participants;
     users.forEach((user)=>{
+      console.log(user);
       let socketId = userSocketIds.get(user.username);
+      console.log(socketId);
       if(socketId){
-        io.to(socketId).emit("message", content, sender, chatId);
+        io.to(socketId).emit("message", msgPayload, chatId);
       }
     });
   });
@@ -203,7 +208,10 @@ io.on("connection", (socket) => {
   /**
    * Sets a username as logged in
    */
-  socket.on("logged in", (username) => {userSocketIds.set(username, socket.id);})
+  socket.on("logged in", (username) => {
+    console.log(username + " is logged in");
+    userSocketIds.set(username, socket.id);
+  });
   /**
    * Attempts to register a user with the given credentials.
    */
