@@ -1,9 +1,10 @@
 <template>
   <b-container>
-    <b-row
-      ><div class="header">
-        <chat-options class="chat-options" style="float: right" /></div
-    ></b-row>
+    <b-row>
+      <div class="header">
+        <chat-options class="chat-options" style="float: right" />
+      </div>
+    </b-row>
     <b-row class="chat-display"></b-row>
     <b-row>
       <div class="chat-input-div">
@@ -31,29 +32,87 @@
 
 <script>
 import ChatOptions from "./ChatOptions.vue";
+import { mapMutations, mapState } from "vuex";
+
 export default {
+  name: "ChatCanvas",
   components: { ChatOptions },
   data() {
     return {
       msgInput: "",
-      currentChat: "testChat",
+      currentChatId: "",
     };
   },
-  name: "ChatCanvas",
+  computed: { ...mapState({ user: (state) => state.user }) },
   methods: {
+    ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
-      let payload = {
-        content: this.msgInput,
-        chatId: this.currentChat,
-        from: this.$store.state.user.userName,
-      };
-      this.$socket.emit("message", payload);
+      console.log("Sending a message " + this.msgInput);
+      this.$socket.emit(
+        "add message to chat",
+        this.msgInput,
+        this.$store.state.user.userName,
+        this.currentChatId
+      );
+    },
+    addMessageToUI(msg) {
+      // TODO add to the UI
+      if (msg.username === this.$store.state.user.username) {
+        console.log("from ME:" + msg.content);
+      } else {
+        console.log("from " + msg.username + ": " + msg.content);
+      }
+    },
+    updateUIWithChatMessages() {
+      const curChat = this.getChatInfo(this.currentChatId);
+      curChat.messages.forEach(this.addMessageToUI);
+    },
+    getChatInfo(chatId) {
+      return this.user.chats.find((chat) => {
+        return chat._id === chatId;
+      });
+    },
+    getChatIdx(chatId) {
+      return this.user.chats.findIndex((chat) => {
+        return chat._id === chatId;
+      });
     },
   },
+  created() {
+    // TODO un hardcode a username in store
+    this.setUserName("bob");
+    // retrieve chats
+    this.$socket.emit("get chats", this.$store.state.user.username);
+  },
   mounted() {
-    this.$socket.on("message", (payload) => {
-      // TODO display
-      console.log(payload);
+    this.$socket.on("user chats", (chats) => {
+      let payload = {
+        username: this.$store.state.user.username,
+        chats: chats,
+      };
+      this.setUserInfo(payload);
+      this.currentChatId = chats[0]._id;
+      // update ui
+      this.updateUIWithChatMessages();
+    });
+    this.$socket.on("message", (msgPayload, chatId) => {
+      console.log("Received message from server");
+      // add to store
+      const userInfo = this.user;
+      let updatedChatIdx = this.getChatIdx(chatId);
+      userInfo.chats[updatedChatIdx].messages[
+        userInfo.chats[updatedChatIdx].messages.length
+      ] = msgPayload;
+      this.setUserInfo(userInfo);
+      if (chatId === this.currentChatId) {
+        // add to UI
+        this.addMessageToUI(msgPayload);
+      }
+    });
+    this.$socket.on("get username", () => {
+      if (this.$store.state.user.username) {
+        this.$socket.emit("logged in", this.$store.state.user.username);
+      }
     });
   },
 };

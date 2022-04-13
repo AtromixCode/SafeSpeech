@@ -1,20 +1,19 @@
 export default {
   namespaced: true,
   state: () => ({
-    userName: "",
-    userId: "",
+    username: "",
     chats: [
       {
-        messages: [{ timeStamp: "", content: "", from: "" }],
-        lastUpdated: "",
-        title: "",
-        members: "",
+        messages: [{ timeStamp: "", content: "", username: "" }],
+        participants: [{ username: "" }],
+        chatTitle: "",
+        _id: "",
       },
     ],
   }),
   mutations: {
-    setUserName(state, userName) {
-      state.userName = userName;
+    setUserName(state, username) {
+      state.username = username;
     },
 
     setUserInfo(state, userInfo) {
