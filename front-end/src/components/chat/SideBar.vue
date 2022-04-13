@@ -100,7 +100,7 @@ export default {
           "create chat",
           "",
           [],
-          [username, this.input.friends_username]
+          [this.user.username, this.input.friends_username]
         );
       }
     },
