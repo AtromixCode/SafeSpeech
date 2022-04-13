@@ -16,13 +16,9 @@ export default {
 
   computed: { ...mapState({ user: (state) => state.user }) },
   methods: { ...mapMutations("user", ["setUserName", "setUserInfo"]) },
-  created() {
-    this.$socket.emit("message", "a message");
-  },
+  created() {},
 
-  mounted() {
-    console.log(this.user);
-  },
+  mounted() {},
 };
 </script>
 
