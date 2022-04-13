@@ -95,6 +95,13 @@
 </template>
 
 <script>
+/**
+ * Allows users to log into the system to access their chats or register via the register button.
+ *
+ * Authors:
+ * Nicholas Cervania
+ * Jean-David Rousseau
+ */
 import bcrypt from "bcryptjs";
 
 export default {
@@ -111,6 +118,10 @@ export default {
     msg: String,
   },
   methods: {
+    /**
+     * If function is called with username and password filled out, requests corresponding user info to perform validation
+     * Yes technically the validation should be done on the server side but that requires sending plain text passwords over the internet. (TODO)
+     */
     login() {
       // send request for salted password
       if (this.input.username !== "" && this.input.password !== "") {
@@ -119,22 +130,26 @@ export default {
         console.log("A username and password must be present");
       }
     },
+    /**
+     * Returns whether the user agent is on mobile or not.
+     * @returns {boolean} true if mobile else false.
+     */
     isMobile() {
-      if (
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        )
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+      return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
     },
+    /**
+     * routes the page to the chat view.
+     */
     goToChat() {
       this.$router.push("/chat");
     },
   },
   mounted() {
+    /**
+     * Handles receiving information about the username, chekcs if salted password matches memory password.
+     */
     this.$socket.on("user info", (userInfo) => {
       bcrypt.compare(this.input.password, userInfo.password, (err, result) => {
         if (result) {
