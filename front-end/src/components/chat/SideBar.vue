@@ -27,6 +27,7 @@
                 style="float: right; color: white; font-size: 1.25rem"
                 variant="something"
                 aria-label="logout"
+                v-on:click="logout"
                 ><b-icon icon="door-open"
               /></b-button>
             </b-col>
@@ -127,7 +128,7 @@
 
 <script scoped>
 import ChatOptions from "./ChatOptions.vue";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 import ChatList from "./ChatList.vue";
 export default {
   components: { ChatOptions, ChatList },
@@ -173,6 +174,15 @@ export default {
       this.input.groupChat_friends_username = "";
       this.groupChatUsers = [];
       this.$bvModal.hide("modal-1");
+    },
+    closeModal() {
+      this.$bvModal.hide("modal");
+    },
+    ...mapMutations("user", ["setUserName", "setUserInfo", "resetUserInfo"]),
+    logout() {
+      this.resetUserInfo();
+      this.$socket.emit("logged out", this.user.username);
+      this.$router.push("/");
     },
     addUserToGroupChatList() {
       //add the username to groupChatUsers

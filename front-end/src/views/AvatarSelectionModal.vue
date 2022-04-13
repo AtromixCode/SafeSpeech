@@ -15,15 +15,11 @@ export default {
             <div class="modal-body">
               <img
                 src="../assets/ProfilePicture1.svg"
-                @click="
-                  selectAvatar('/img/ProfilePicture1.b2c1f36d.svg', $event)
-                "
+                @click="selectAvatar('ProfilePicture1.svg', $event)"
               />
               <img
                 src="../assets/ProfilePicture2.svg"
-                @click="
-                  selectAvatar('/img/ProfilePicture2.099b49b8.svg', $event)
-                "
+                @click="selectAvatar('ProfilePicture2.svg', $event)"
               />
             </div>
 
@@ -48,15 +44,11 @@ export default {
             <div class="modal-body-mobile">
               <img
                 src="../assets/ProfilePicture1.svg"
-                @click="
-                  selectAvatar('/img/ProfilePicture1.b2c1f36d.svg', $event)
-                "
+                @click="selectAvatar('ProfilePicture1.svg', $event)"
               />
               <img
                 src="../assets/ProfilePicture2.svg"
-                @click="
-                  selectAvatar('/img/ProfilePicture2.099b49b8.svg', $event)
-                "
+                @click="selectAvatar('ProfilePicture2.svg', $event)"
               />
             </div>
             <div class="modal-footer">
