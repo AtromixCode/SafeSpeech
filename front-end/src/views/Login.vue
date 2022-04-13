@@ -30,9 +30,7 @@
             <button type="button" class="btn btn-dark" v-on:click="login()">
               Login
             </button>
-            <button type="button" class="btn btn-light" v-on:click="login()">
-              Cancel
-            </button>
+            <button type="button" class="btn btn-light">Cancel</button>
           </div>
         </div>
         <div class="col"></div>

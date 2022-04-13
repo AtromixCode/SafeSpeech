@@ -36,10 +36,37 @@
               user.userName
             }}</span></b-row
           >
+          <b-row>
+            <b-col md="auto">
+              <b-button
+                v-b-modal.modal-1
+                style="color: white; font-size: 1.25rem"
+                variant="something"
+                aria-label="logout"
+              >
+                <img src="../../assets/NewUser.svg" />
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
         <chat-list :buttonList="buttons" />
       </template>
     </b-sidebar>
+    <b-modal id="modal-1" title="BootstrapVue" hide-footer>
+      <div class="form-control">
+        <input
+          type="text"
+          placeholder="Friend's Username"
+          v-model="input.friends_username"
+        />
+      </div>
+      <div class="col-md-12 text-center">
+        <button type="button" class="btn btn-dark" v-on:click="createNewChat()">
+          Add
+        </button>
+        <button type="button" class="btn btn-light">Cancel</button>
+      </div>
+    </b-modal>
   </div>
 </template>
 
@@ -50,7 +77,13 @@ import ChatList from "./ChatList.vue";
 export default {
   components: { ChatOptions, ChatList },
   name: "SideBar",
-
+  data() {
+    return {
+      input: {
+        username: "",
+      },
+    };
+  },
   computed: {
     ...mapState({ user: (state) => state.user }),
     buttons() {
@@ -58,6 +91,18 @@ export default {
         return { id: el._id, title: el.title, highlighted: false };
       });
       return buttonProperties;
+    },
+  },
+  methods: {
+    createNewChat() {
+      if (this.input.friends_username != "") {
+        this.$socket.emit(
+          "create chat",
+          "",
+          [],
+          [username, this.input.friends_username]
+        );
+      }
     },
   },
 };
@@ -89,6 +134,10 @@ export default {
 
 div {
   color: white;
+}
+
+button {
+  display: inline-block;
 }
 
 .header {
