@@ -23,6 +23,13 @@ export default {
       return state;
     },
 
+    recieveMessage(state, data) {
+      const chatGettingMessage = (chat) => {
+        return chat._id === data.chatId;
+      };
+      state.chats.find(chatGettingMessage).messages.push(data.msgPayload);
+    },
+
     resetUserInfo(state) {
       let emptyState = {
         userName: "",

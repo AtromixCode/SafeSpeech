@@ -43,14 +43,13 @@ export default {
     return {
       msgInput: "",
       currentChatId: "",
-      messages: [],
     };
   },
   computed: {
     ...mapState({ user: (state) => state.user }),
   },
   methods: {
-    ...mapMutations("user", ["setUserName", "setUserInfo"]),
+    ...mapMutations("user", ["setUserName", "setUserInfo", "recieveMessage"]),
     sendMessage() {
       console.log("Sending a message " + this.msgInput);
       this.$socket.emit(
@@ -60,29 +59,6 @@ export default {
         this.currentChatId
       );
       this.msgInput = "";
-    },
-    addMessageToUI(msg) {
-      // TODO add to the UI
-      if (msg.username === this.$store.state.user.username) {
-        console.log("from ME:" + msg.content);
-      } else {
-        console.log("from " + msg.username + ": " + msg.content);
-      }
-    },
-    updateUIWithChatMessages() {
-      const curChat = this.getChatInfo(this.currentChatId);
-      // curChat.messages.forEach(this.addMessageToUI);
-      this.messages = curChat.messages;
-    },
-    getChatInfo(chatId) {
-      return this.user.chats.find((chat) => {
-        return chat._id === chatId;
-      });
-    },
-    getChatIdx(chatId) {
-      return this.user.chats.findIndex((chat) => {
-        return chat._id === chatId;
-      });
     },
   },
   created() {
@@ -98,24 +74,11 @@ export default {
         chats: chats,
       };
       this.setUserInfo(payload);
-      this.currentChatId = chats[0]._id;
-      // update ui
-      this.updateUIWithChatMessages();
     });
     this.$socket.on("message", (msgPayload, chatId) => {
       console.log("Received message from server");
-      // add to store
-      const userInfo = this.user;
-      let updatedChatIdx = this.getChatIdx(chatId);
-      userInfo.chats[updatedChatIdx].messages[
-        userInfo.chats[updatedChatIdx].messages.length
-      ] = msgPayload;
-      this.setUserInfo(userInfo);
-      if (chatId === this.currentChatId) {
-        // add to UI
-        this.messages = userInfo.chats[updatedChatIdx].messages;
-        this.addMessageToUI(msgPayload);
-      }
+      this.recieveMessage({ msgPayload, chatId });
+      this.$forceUpdate();
     });
     this.$socket.on("get username", () => {
       if (this.$store.state.user.username) {
@@ -124,8 +87,8 @@ export default {
     });
 
     bus.$on("chat-click", (chatId) => {
-      if (this.currentChat != chatId) {
-        this.currentChat = chatId;
+      if (this.currentChatId != chatId) {
+        this.currentChatId = chatId;
       }
     });
   },
