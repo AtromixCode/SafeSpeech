@@ -1,21 +1,21 @@
 require("dotenv").config();
 /**
- Main server file, allows interaction with the MongoDB with credentials in the .env file.
- Handles communicating to the children and handling talking between the children.
-
- MongoDB specs:
-  users collection:
-    username: "" // unique key
-    password: ""
-    ... other data
-  chats collection:
-    chatTitle: ""
-    messages: [...{content: "", username: "", timestamp: Date}]
-    participants: [...{username: "", ...other info}]
-
- Author(s):
- Victor Sanchez
- Jean-David Rousseau
+ * Main server file, allows interaction with the MongoDB with credentials in the .env file.
+ * Handles communicating to the children and handling talking between the children.
+ *
+ * MongoDB specs:
+ *  users collection:
+ *    username: "" // unique key
+ *    password: ""
+ *    ... other data
+ *  chats collection:
+ *    chatTitle: ""
+ *    messages: [...{content: "", username: "", timestamp: Date}]
+ *    participants: [...{username: "", ...other info}]
+ *
+ * Author(s):
+ * Victor Sanchez
+ * Jean-David Rousseau
  */
 const app = require("express")();
 const http = require("http").Server(app);
