@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
-    ...mapMutations("keyStore", ["setKeys", "resetState"]),
+    ...mapMutations("key", ["setKey", "resetState"]),
     sendMessage() {
       console.log("Sending a message " + this.msgInput);
       this.$socket.emit(
@@ -132,7 +132,6 @@ export default {
       }
     });
     this.$socket.on("key", async (key) => {
-      console.log(key);
       const kkey = await window.crypto.subtle.importKey(
         "jwk",
         key,
@@ -140,11 +139,7 @@ export default {
         true,
         ["encrypt", "decrypt"]
       );
-      console.log(kkey);
-      // console.log("Setting keys");
-      // this.setKeys(keyInfo);
-      // console.log(this.$store.state.keyStore.publicKey);
-      // console.log(this.$store.state.keyStore.privateKey);
+      this.setKey(kkey);
     });
     bus.$on("chat-click", (chatId) => {
       if (this.currentChat != chatId) {
