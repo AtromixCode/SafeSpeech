@@ -168,9 +168,9 @@ export default {
     },
     async register() {
       if (
-        this.input.username != "" &&
-        this.input.password != "" &&
-        this.input.password == this.input.password_confirm
+        this.input.username !== "" &&
+        this.input.password !== "" &&
+        this.input.password === this.input.password_confirm
       ) {
         let username = this.input.username;
         let password = this.input.password;
@@ -180,8 +180,8 @@ export default {
               console.log(salt);
               console.log(err);
             }
-            this.$socket.emit("check new login", {
-              userName: username,
+            this.$socket.emit("register user", {
+              username: username,
               password: salt,
             });
           });

@@ -21,28 +21,25 @@ const tomorrow = new Date();
 // Add 1 Day
 tomorrow.setDate(today.getDate() + 2);
 
-async function addUser(user, socket) {
+async function addUser(user) {
   try {
     await client.connect();
-
     const result = await client
       .db("safe_speech")
       .collection("users")
       .insertOne(user);
-
-    console.log("username OK");
-    socket.emit("ok username");
-    userSocketIds.set(user.userName, socket.id);
     console.log(result);
   } catch (e) {
     console.log(e.message);
-    if (e.code == 11000) {
-      console.log(
-        "The userName is a unique index, please add handle of error so that the user knows they need another user name"
-      );
-      socket.emit("bad username");
-    }
   }
+}
+async function getUser(username){
+  await client.connect();
+  let query = { username: username };
+  return await client
+      .db("safe_speech")
+      .collection("users")
+      .findOne(query);
 }
 // async function addMessage(userName, message, chatId) {
 //   try {
@@ -92,48 +89,6 @@ async function checkUsernameExists(user, socket) {
     console.log("checking " + user);
     await client.connect();
     addUser(user, socket);
-  } catch (e) {
-    console.log(e.message);
-  } finally {
-    //await client.close();
-  }
-}
-async function checkLoginCredentials(user, socket) {
-  try {
-    await client.connect();
-    let query = { userName: user.userName };
-    const result = await client
-      .db("safe_speech")
-      .collection("users")
-      .findOne(query);
-
-    console.log("query is:");
-    console.log(query);
-    console.log("result is:");
-    console.log(result);
-
-    if (result == undefined) {
-      socket.emit("bad credentials");
-    } else {
-      /*let hash = result.password;
-      bcrypt.compare(saltedHash, hash, function (err, result) {
-        if (result) {
-          socket.emit("login ok", result[0]);
-        } else {
-          socket.emit("bad credentials");
-        }
-      });*/
-
-      if (
-        result.password == user.password &&
-        result.userName == user.userName
-      ) {
-        socket.emit("login ok", result[0]);
-        userSocketIds.set(user.userName, socket.id);
-      } else {
-        socket.emit("bad credentials");
-      }
-    }
   } catch (e) {
     console.log(e.message);
   } finally {
@@ -195,7 +150,9 @@ async function addMessageToChat(content, sender, chatId){
 io.on("connection", (socket) => {
   console.log("Connection started");
   // TODO on disconnect remove socket from map
-
+  socket.on("get user", async (username) => {
+    io.to(socket.id).emit("user info", await getUser(username));
+  });
   socket.on("get chats", async (userName) => {
     io.to(socket.id).emit("user chats", await getUserChats(userName));
   });
@@ -227,15 +184,19 @@ io.on("connection", (socket) => {
     console.log(pubKey);
     io.to(socket.id).emit("pubkey", pubKey);
   });
-
-  socket.on("check new login", function (credentials) {
-    console.log(credentials);
-    checkUsernameExists(credentials, socket);
-  });
-
-  socket.on("check login credentials", (credentials) => {
-    //login
-    checkLoginCredentials(credentials, socket);
+  socket.on("logged in", (username) => {userSocketIds.set(username, socket.id);})
+  socket.on("register user", async (credentials) => {
+    const user = await getUser(credentials.username);
+    if (user){
+      console.log("Found a user with username");
+      io.to(socket.id).emit("bad username");
+    } else{
+      console.log("good");
+      io.to(socket.id).emit("ok username");
+      // add to db
+      await addUser(credentials);
+      userSocketIds.set(credentials.username, socket.id);
+    }
   });
 });
 
@@ -253,3 +214,5 @@ http.listen(port, () => {
 // console.log(getChats("bob"));
 //
 // addMessageToChat("Message 3", "bob", ObjectId("6256227058e97bee48b8c1cf"));
+//
+// console.log(getUser("a"));

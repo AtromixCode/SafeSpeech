@@ -95,8 +95,7 @@
 </template>
 
 <script>
-// import bcrypt from "bcryptjs";
-// const saltRounds = 10;
+import bcrypt from "bcryptjs";
 
 export default {
   name: "LoginView",
@@ -113,18 +112,9 @@ export default {
   },
   methods: {
     login() {
-      if (this.input.username != "" && this.input.password != "") {
-        let username = this.input.username;
-        let password = this.input.password;
-        /*
-        let saltedHash = bcrypt.genSalt(saltRounds, function (err, salt) {
-          bcrypt.hash(password, salt, function () {});
-        });
-        */
-        this.$socket.emit("check login credentials", {
-          userName: username,
-          password: password,
-        });
+      // send request for salted password
+      if (this.input.username !== "" && this.input.password !== "") {
+        this.$socket.emit("get user", this.input.username);
       } else {
         console.log("A username and password must be present");
       }
@@ -145,13 +135,18 @@ export default {
     },
   },
   mounted() {
-    this.$socket.on("login ok", () => {
-      //login
-      this.goToChat();
-    });
-    this.$socket.on("bad credentials", () => {
-      //throw error
-      alert("bad credentials");
+    this.$socket.on("user info", (userInfo) => {
+      bcrypt.compare(this.input.password, userInfo.password, (err, result) => {
+        if (result) {
+          console.log("It matches!");
+          this.$socket.emit("logged in", userInfo.username);
+          this.goToChat();
+        }
+        // if passwords do not match
+        else {
+          console.log("Invalid password!");
+        }
+      });
     });
   },
 };
