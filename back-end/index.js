@@ -41,60 +41,6 @@ async function getUser(username){
       .collection("users")
       .findOne(query);
 }
-// async function addMessage(userName, message, chatId) {
-//   try {
-//     await client.connect();
-//
-//     const result = await client
-//         .db("safe_speech")
-//         .collection("chats").insertOne({
-//
-//           timeStamp: today,
-//           content: message,
-//           from: userName,
-//           chatId: chatId
-//         })
-//     // .insertOne({
-//     //   messages: [
-//     //     {
-//     //       timeStamp: today,
-//     //       content: "This is a message",
-//     //       from: "AnoterUserName",
-//     //     },
-//     //     {
-//     //       timeStamp: tomorrow,
-//     //       content: "This is a message",
-//     //       from: "TestUsername",
-//     //     },
-//     //   ],
-//     //   title: "Example title",
-//     //   members: ["AnoterUserName", "TestUsername"],
-//     //   lastUpdated: today,
-//     // });
-//
-//     console.log(result);
-//   } catch (e) {
-//     console.log(e.message);
-//     if (e.code == 11000) {
-//       console.log(
-//           "The userName is a unique index, please add handle of error so that the user knows they need another user name"
-//       );
-//     }
-//   } finally {
-//     await client.close();
-//   }
-// }
-async function checkUsernameExists(user, socket) {
-  try {
-    console.log("checking " + user);
-    await client.connect();
-    addUser(user, socket);
-  } catch (e) {
-    console.log(e.message);
-  } finally {
-    //await client.close();
-  }
-}
 async function createChat(chatTitle, messages, participants){
   try {
     await client.connect();
