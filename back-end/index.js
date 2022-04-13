@@ -213,6 +213,13 @@ io.on("connection", (socket) => {
     userSocketIds.set(username, socket.id);
   });
   /**
+   * Sets a username as logged out and closes the socket.
+   */
+  socket.on("logged out", (username) => {
+    console.log(username + " has logged out");
+    userSocketIds.delete(username);
+  });
+  /**
    * Attempts to register a user with the given credentials.
    */
   socket.on("register user", async (credentials) => {

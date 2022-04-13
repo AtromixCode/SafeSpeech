@@ -96,15 +96,17 @@
                 v-model="input.password_confirm"
                 placeholder="Confirm password"
               />
-              <router-link to="/"> Have an account? Login here! </router-link>
+              <router-link to="/">Have an account? Login here!</router-link>
             </div>
             <button type="button" class="btn btn-dark" v-on:click="register()">
               Register
             </button>
-            <button type="button" class="btn btn-light">Cancel</button>
+            <button type="button" class="btn btn-light" v-on:click="register()">
+              Cancel
+            </button>
           </div>
         </div>
-        <div class="col"><img src="../assets/Mobile.svg" height="220vh" /></div>
+        <div class="row"><img src="../assets/Mobile.svg" height="220vh" /></div>
       </div>
       <img
         src="../assets/leftCircle.svg"
