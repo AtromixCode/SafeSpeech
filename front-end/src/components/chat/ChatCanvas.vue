@@ -5,11 +5,11 @@
         <chat-options class="chat-options" style="float: right" />
       </div>
     </b-row>
-<!--    <b-row class="chat-display">-->
-<!--      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">-->
-<!--        {{ msg.content }} - {{ idx }}-->
-<!--      </li>-->
-<!--    </b-row>-->
+    <!--    <b-row class="chat-display">-->
+    <!--      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">-->
+    <!--        {{ msg.content }} - {{ idx }}-->
+    <!--      </li>-->
+    <!--    </b-row>-->
     <b-row
       ><div class="header">
         <chat-options class="chat-options" style="float: right" /></div
