@@ -5,7 +5,11 @@
         <chat-options class="chat-options" style="float: right" />
       </div>
     </b-row>
-    <b-row class="chat-display"></b-row>
+    <b-row class="chat-display">
+      <li v-for="(msg, idx) in messages" :key="idx">
+        {{ msg.content }} - {{ idx }}
+      </li>
+    </b-row>
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -41,9 +45,12 @@ export default {
     return {
       msgInput: "",
       currentChatId: "",
+      messages: [],
     };
   },
-  computed: { ...mapState({ user: (state) => state.user }) },
+  computed: {
+    ...mapState({ user: (state) => state.user }),
+  },
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
@@ -65,7 +72,8 @@ export default {
     },
     updateUIWithChatMessages() {
       const curChat = this.getChatInfo(this.currentChatId);
-      curChat.messages.forEach(this.addMessageToUI);
+      // curChat.messages.forEach(this.addMessageToUI);
+      this.messages = curChat.messages;
     },
     getChatInfo(chatId) {
       return this.user.chats.find((chat) => {
@@ -106,6 +114,7 @@ export default {
       this.setUserInfo(userInfo);
       if (chatId === this.currentChatId) {
         // add to UI
+        this.messages = userInfo.chats[updatedChatIdx].messages;
         this.addMessageToUI(msgPayload);
       }
     });
