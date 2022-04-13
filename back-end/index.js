@@ -190,23 +190,6 @@ io.on("connection", (socket) => {
     });
   });
   /**
-   * Sets the public key for a username
-   */
-  socket.on("set pubkey", (obj)=>{
-    console.log(obj);
-    userKeys.set(obj.user, obj.key);
-    console.log(userKeys.get(obj.user));
-  });
-  /**
-   * Gets the public key for a username
-   */
-  socket.on("get pubkey", (obj)=>{
-    console.log("Pub key request for "+obj.user);
-    let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
-    console.log(pubKey);
-    io.to(socket.id).emit("pubkey", pubKey);
-  });
-  /**
    * Sets a username as logged in
    */
   socket.on("logged in", (username) => {
