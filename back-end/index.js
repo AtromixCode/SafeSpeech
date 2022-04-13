@@ -196,7 +196,7 @@ io.on("connection", (socket) => {
     console.log(username + " is logged in");
     userSocketIds.set(username, socket.id);
     // send the keys
-    io.to(socket.id).emit("keys", publicKey, privateKey);
+    io.to(socket.id).emit("key", key);
   });
   /**
    * Attempts to register a user with the given credentials.
@@ -215,23 +215,9 @@ io.on("connection", (socket) => {
     }
   });
 });
-const {
-  publicKey,
-  privateKey,
-} = crypto.generateKeyPairSync('rsa-pss', {
-  modulusLength: 2048,
-  hashAlgorithm: "sha256",
-  publicKeyEncoding: {
-    type: 'spki',
-    format: 'pem'
-  },
-  privateKeyEncoding: {
-    type: 'pkcs8',
-    format: 'pem',
-  }
-});
-console.log(publicKey);
-console.log(privateKey);
+// crypto.generateKey()
+const key = crypto.generateKeySync('aes', {length: 128}).export({format: 'jwk'});
+
 /**
  * Starts a server at the port
  */
