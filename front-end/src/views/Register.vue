@@ -138,6 +138,13 @@
 </template>
 
 <script>
+/**
+ * Allows users to register into the system to start chatting or log in via the log in button.
+ *
+ * Authors:
+ * Nicholas Cervania
+ * Jean-David Rousseau
+ */
 import Modal from "./AvatarSelectionModal.vue";
 import bcrypt from "bcryptjs";
 const saltRounds = 10;
@@ -161,11 +168,18 @@ export default {
     Modal,
   },
   methods: {
+    /**
+     * Save the avatar path and replaces the preview image.
+     * @param avatar the path to the avatar image
+     */
     saveAvatar(avatar) {
-      // Save the avatar path and replaces the preview image.
       this.avatar_preview = avatar;
       this.selected_avatar = avatar;
     },
+    /**
+     * Salts the password and sends it over to the server to review.
+     * @returns nothing
+     */
     async register() {
       if (
         this.input.username !== "" &&
@@ -190,6 +204,10 @@ export default {
         console.log("A username and password must be present");
       }
     },
+    /**
+     * Returns whether the user agent is on mobile or not.
+     * @returns {boolean} true if mobile else false.
+     */
     isMobile() {
       if (
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -201,14 +219,23 @@ export default {
         return false;
       }
     },
+    /**
+     * routes the page to the chat view.
+     */
     goToChat() {
       this.$router.push("/chat");
     },
   },
   mounted() {
+    /**
+     * server oks the username, thus go to the chat page
+     */
     this.$socket.on("ok username", () => {
       this.goToChat();
     });
+    /**
+     * server does not accept the username, thus display alert
+     */
     this.$socket.on("bad username", () => {
       alert("username taken, pick another one");
     });
