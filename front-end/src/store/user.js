@@ -1,14 +1,15 @@
 export default {
   namespaced: true,
+
   state: () => ({
-    userName: "",
-    userId: "",
+    username: "",
+    _id: "",
     chats: [
       {
-        messages: [{ timeStamp: "", content: "", from: "" }],
-        lastUpdated: "",
-        title: "",
-        members: "",
+        messages: [{ content: "", username: "", timestamp: Date }],
+        _id: "",
+        chatTitle: "",
+        participants: [],
       },
     ],
   }),
@@ -26,14 +27,14 @@ export default {
 
     resetUserInfo(state) {
       let emptyState = {
-        userName: "",
-        userId: "",
+        username: "",
+        _id: "",
         chats: [
           {
-            messages: [{ timeStamp: "", content: "", from: "" }],
-            lastUpdated: "",
-            title: "",
-            members: "",
+            messages: [{ content: "", username: "", timestamp: Date }],
+            _id: "",
+            chatTitle: "",
+            participants: [],
           },
         ],
       };

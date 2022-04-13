@@ -4,7 +4,7 @@
       ><div class="header">
         <chat-options class="chat-options" style="float: right" /></div
     ></b-row>
-    <b-row class="chat-display"></b-row>
+    <b-row class="chat-display"><message-list /></b-row>
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -25,9 +25,16 @@
 
 <script>
 import ChatOptions from "./ChatOptions.vue";
+import { bus } from "@/main.js";
+import MessageList from "./MessageList.vue";
 export default {
-  components: { ChatOptions },
+  components: { ChatOptions, MessageList },
   name: "ChatCanvas",
+  mounted() {
+    bus.$on("test", (data) => {
+      console.log(data);
+    });
+  },
 };
 </script>
 

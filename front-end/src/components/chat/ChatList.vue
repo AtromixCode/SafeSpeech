@@ -3,6 +3,7 @@
     <nav>
       <ul>
         <b-button
+          v-b-toggle.sidebar-1
           v-for="chat in buttons"
           v-bind:pressed="chat.highlighted"
           :key="chat.id"
@@ -20,6 +21,7 @@
 </template>
 
 <script>
+import { bus } from "@/main.js";
 export default {
   name: "ChatList",
   props: ["buttonList"],
@@ -42,6 +44,8 @@ export default {
       });
 
       this.buttons.find(isClickedButton).highlighted = true;
+      bus.$emit("chat-click", chatId);
+      this.$forceUpdate();
     },
   },
 };
