@@ -30,6 +30,10 @@ export default {
       state.chats.find(chatGettingMessage).messages.push(data.msgPayload);
     },
 
+    addChat(state, data) {
+      state.chats.push(data);
+    },
+
     resetUserInfo(state) {
       let emptyState = {
         userName: "",

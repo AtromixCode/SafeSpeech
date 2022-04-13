@@ -154,6 +154,7 @@ ul::-webkit-scrollbar {
 }
 
 .chat-container {
-  height: 85%;
+  height: 89%;
+  padding-bottom: 1vh !important;
 }
 </style>

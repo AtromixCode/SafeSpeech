@@ -57,6 +57,7 @@ export default {
 .messages-container {
   height: 95%;
   padding-right: 20px;
+  padding-bottom: 20px;
   overflow: auto;
   display: flex;
   flex-direction: column-reverse;

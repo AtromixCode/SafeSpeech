@@ -29,8 +29,8 @@ const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
 let userKeys = new Map();
 let userSocketIds = new Map();
-const { MongoClient, ServerApiVersion, ObjectId} = require("mongodb");
-const {json} = require("express");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { json } = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
@@ -58,17 +58,19 @@ async function addUser(user) {
  * @param participants: list of participants in the chat, in user format (passwords omitted)
  * @returns nothing
  */
-async function createChat(chatTitle, messages, participants){
+async function createChat(chatTitle, messages, participants) {
   try {
     await client.connect();
     const result = await client
-        .db("safe_speech")
-        .collection("chats").insertOne({
-          chatTitle: chatTitle,
-          messages: messages,
-          participants: participants
-        })
-    console.log(result);
+      .db("safe_speech")
+      .collection("chats")
+      .insertOne({
+        chatTitle: chatTitle,
+        messages: messages,
+        participants: participants,
+      });
+    console.log(result.insertedId.toString());
+    return result.insertedId.toString();
   } catch (e) {
     console.log(e.message);
   } finally {
@@ -83,15 +85,13 @@ async function createChat(chatTitle, messages, participants){
  * @param chatId the chat ID to which this message will be appended
  * @returns nothing.
  */
-async function addMessageToChat(msgPayload, chatId){
+async function addMessageToChat(msgPayload, chatId) {
   try {
     await client.connect();
     const result = await client
-        .db("safe_speech")
-        .collection("chats").updateOne(
-            {_id: chatId},
-            { "$push": {messages: msgPayload }}
-        );
+      .db("safe_speech")
+      .collection("chats")
+      .updateOne({ _id: chatId }, { $push: { messages: msgPayload } });
     console.log(result);
   } catch (e) {
     console.log(e.message);
@@ -105,13 +105,10 @@ async function addMessageToChat(msgPayload, chatId){
  * @param username the username to query for.
  * @returns {Promise<Document & {_id: InferIdType<Document>}>} that represents the user, or null.
  */
-async function getUser(username){
+async function getUser(username) {
   await client.connect();
   let query = { username: username };
-  return await client
-      .db("safe_speech")
-      .collection("users")
-      .findOne(query);
+  return await client.db("safe_speech").collection("users").findOne(query);
 }
 
 /**
@@ -119,13 +116,10 @@ async function getUser(username){
  * @param username the username to query for.
  * @returns {Promise<WithId<Document>[]>} list of all chats in which the user is listed as a participant.
  */
-async function getUserChats(username){
+async function getUserChats(username) {
   await client.connect();
-  let query = {participants: {username: username}};
-  const cursor = await client
-      .db("safe_speech")
-      .collection("chats")
-      .find(query);
+  let query = { participants: { username: username } };
+  const cursor = await client.db("safe_speech").collection("chats").find(query);
   return await cursor.toArray();
 }
 
@@ -134,13 +128,10 @@ async function getUserChats(username){
  * @param chatId the chat ID to query for.
  * @returns {Promise<Document & {_id: InferIdType<Document>}>} the chat with the matching ID.
  */
-async function getChat(chatId){
+async function getChat(chatId) {
   await client.connect();
-  let query = {_id: chatId};
-  return await client
-      .db("safe_speech")
-      .collection("chats")
-      .findOne(query);
+  let query = { _id: chatId };
+  return await client.db("safe_speech").collection("chats").findOne(query);
 }
 
 /**
@@ -167,23 +158,38 @@ io.on("connection", (socket) => {
    * Creates a chat with the specified information in the DB.
    */
   socket.on("create chat", async (chatTitle, messages, users) => {
-    await createChat(chatTitle, messages, users);
-  })
+    const cretedChatId = await createChat(chatTitle, messages, users);
+    users.forEach((user) => {
+      let socketId = userSocketIds.get(user.username);
+      if (socketId) {
+        io.to(socketId).emit("chat", {
+          chatTitle: chatTitle,
+          messages: messages,
+          participants: users,
+          _id: cretedChatId,
+        });
+      }
+    });
+  });
   /**
    * Adds a message to the specified chat, and pushes the new message to all chat participants.
    */
   socket.on("add message to chat", async (content, sender, chatId) => {
     // assuming you get just the string otherwise ObjectId not necessary
-    let msgPayload = {content:content, username:sender, timestamp:new Date()};
+    let msgPayload = {
+      content: content,
+      username: sender,
+      timestamp: new Date(),
+    };
     await addMessageToChat(msgPayload, ObjectId(chatId));
     // send message to all participants
     const chat = await getChat(ObjectId(chatId));
     const users = chat.participants;
-    users.forEach((user)=>{
+    users.forEach((user) => {
       console.log(user);
       let socketId = userSocketIds.get(user.username);
       console.log(socketId);
-      if(socketId){
+      if (socketId) {
         io.to(socketId).emit("message", msgPayload, chatId);
       }
     });
@@ -191,7 +197,7 @@ io.on("connection", (socket) => {
   /**
    * Sets the public key for a username
    */
-  socket.on("set pubkey", (obj)=>{
+  socket.on("set pubkey", (obj) => {
     console.log(obj);
     userKeys.set(obj.user, obj.key);
     console.log(userKeys.get(obj.user));
@@ -199,9 +205,9 @@ io.on("connection", (socket) => {
   /**
    * Gets the public key for a username
    */
-  socket.on("get pubkey", (obj)=>{
-    console.log("Pub key request for "+obj.user);
-    let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
+  socket.on("get pubkey", (obj) => {
+    console.log("Pub key request for " + obj.user);
+    let pubKey = { user: obj.user, pubKey: userKeys.get(obj.user) };
     console.log(pubKey);
     io.to(socket.id).emit("pubkey", pubKey);
   });
@@ -224,10 +230,10 @@ io.on("connection", (socket) => {
    */
   socket.on("register user", async (credentials) => {
     const user = await getUser(credentials.username);
-    if (user){
+    if (user) {
       console.log("Found a user with username");
       io.to(socket.id).emit("bad username");
-    } else{
+    } else {
       console.log("good");
       io.to(socket.id).emit("ok username");
       // add to db

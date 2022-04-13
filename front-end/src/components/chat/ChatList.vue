@@ -21,7 +21,7 @@
 
 <script>
 import { bus } from "@/main.js";
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 export default {
   name: "ChatList",
   data() {
@@ -34,29 +34,26 @@ export default {
     ...mapState({ user: (state) => state.user }),
   },
   methods: {
+    ...mapMutations("user", ["addChat"]),
     onClick(chatId) {
-      // const isNotClickedButton = (chat) => {
-      //   return chat._id != chatId;
-      // };
-      // const isClickedButton = (chat) => {
-      //   return chat._id === chatId;
-      // };
-      // this.buttons.filter(isNotClickedButton).forEach((notClickedButton) => {
-      //   notClickedButton.highlighted = false;
-      // });
-
-      // this.user.chats.find(isClickedButton).highlighted = true;
       bus.$emit("chat-click", chatId);
       bus.$emit("chat-click", chatId);
       this.$forceUpdate();
     },
+  },
+
+  mounted() {
+    this.$socket.on("chat", (data) => {
+      console.log(data);
+      this.addChat(data);
+    });
   },
 };
 </script>
 
 <style scoped>
 nav ul {
-  height: 85vh;
+  height: 60vh;
   width: 100%;
   overflow: hidden;
   overflow-y: scroll;

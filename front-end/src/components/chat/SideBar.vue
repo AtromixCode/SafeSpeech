@@ -101,7 +101,9 @@
           v-model="input.groupChat_friends_username"
         />
         <ul>
-          <li v-for="item in groupChatUsers" :key="item">{{ item }}</li>
+          <li v-for="(item, idx) in groupChatUsers" :key="idx">
+            {{ item.username }}
+          </li>
         </ul>
       </div>
       <div class="col-md-12 text-center">
@@ -153,17 +155,15 @@ export default {
   methods: {
     createNewChat() {
       if (this.input.friends_username != "") {
-        this.$socket.emit(
-          "create chat",
-          "",
-          [],
-          [this.user.username, this.input.friends_username]
-        );
+        let participants = [];
+        participants.push({ username: this.user.username });
+        participants.push({ username: this.input.friends_username });
+        this.$socket.emit("create chat", "", [], participants);
         this.$bvModal.hide("modal");
       }
     },
     createGroupChat() {
-      this.groupChatUsers.push(this.user.username);
+      this.groupChatUsers.push({ username: this.user.username });
       this.$socket.emit(
         "create chat",
         this.input.chatName,
@@ -187,7 +187,9 @@ export default {
     addUserToGroupChatList() {
       //add the username to groupChatUsers
       if (this.input.groupChat_friends_username != "") {
-        this.groupChatUsers.push(this.input.groupChat_friends_username);
+        this.groupChatUsers.push({
+          username: this.input.groupChat_friends_username,
+        });
         this.input.groupChat_friends_username = "";
       }
     },
