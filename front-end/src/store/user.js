@@ -15,7 +15,7 @@ export default {
   }),
   mutations: {
     setUserName(state, userName) {
-      state.userName = userName;
+      state.username = userName;
     },
 
     setUserInfo(state, userInfo) {
@@ -26,8 +26,9 @@ export default {
     },
 
     resetUserInfo(state) {
+      console.log("doing something");
       let emptyState = {
-        username: "",
+        userName: "",
         _id: "",
         chats: [
           {
@@ -38,9 +39,8 @@ export default {
           },
         ],
       };
-      Object.entries(emptyState).forEach(([k, v]) => {
-        state[k] = v;
-      });
+      this.$store.replaceState(emptyState);
+      return state;
     },
   },
 };

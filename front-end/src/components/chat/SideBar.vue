@@ -33,7 +33,7 @@
           </b-row>
           <b-row
             ><span style="float: center" class="user-info">{{
-              user.userName
+              user.username
             }}</span></b-row
           >
         </b-container>
@@ -55,7 +55,7 @@ export default {
     ...mapState({ user: (state) => state.user }),
     buttons() {
       let buttonProperties = this.user.chats.map((el) => {
-        return { id: el._id, title: el.title, highlighted: false };
+        return { id: el._id, title: el.chatTitle, highlighted: false };
       });
       return buttonProperties;
     },

@@ -29,7 +29,7 @@ export default {
   },
   computed: { ...mapState({ user: (state) => state.user }) },
   methods: {
-    ...mapMutations("user", ["setUserName", "setUserInfo"]),
+    ...mapMutations("user", ["setUserName", "setUserInfo", "resetUserInfo"]),
     resetMessages() {
       const isCurrentChat = (chat) => {
         return chat._id === this.currentId;

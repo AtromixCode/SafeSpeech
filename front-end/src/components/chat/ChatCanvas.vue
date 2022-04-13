@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import { bus } from "@/main.js";
 import ChatOptions from "./ChatOptions.vue";
 import MessageList from "./MessageList.vue";
 export default {
@@ -39,7 +40,7 @@ export default {
   data() {
     return {
       msgInput: "",
-      currentChat: "testChat",
+      currentChat: "",
     };
   },
   methods: {
@@ -49,14 +50,20 @@ export default {
         chatId: this.currentChat,
         username: this.$store.state.user.userName,
       };
-      this.$socket.emit("message", payload);
+      this.$socket.emit("add message to chat", payload);
       this.msgInput = "";
     },
   },
   mounted() {
-    this.$socket.on("message", (payload) => {
+    this.$socket.on("add message to chat", (payload) => {
       // TODO display
       console.log(payload);
+    });
+
+    bus.$on("chat-click", (chatId) => {
+      if (this.currentChat != chatId) {
+        this.currentChat = chatId;
+      }
     });
   },
 };
