@@ -1,19 +1,10 @@
 <template>
   <b-container>
-<<<<<<< HEAD
-    <b-row>
-      <div class="header">
-        <chat-options class="chat-options" style="float: right" />
-      </div>
-    </b-row>
-    <b-row class="chat-display"></b-row>
-=======
     <b-row
       ><div class="header">
         <chat-options class="chat-options" style="float: right" /></div
     ></b-row>
     <b-row class="chat-display"><message-list /></b-row>
->>>>>>> victor/chat
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -41,66 +32,18 @@
 <script>
 import { bus } from "@/main.js";
 import ChatOptions from "./ChatOptions.vue";
-<<<<<<< HEAD
-import { mapMutations, mapState } from "vuex";
-
-export default {
-  name: "ChatCanvas",
-  components: { ChatOptions },
-  data() {
-    return {
-      msgInput: "",
-      currentChatId: "",
-    };
-  },
-  computed: { ...mapState({ user: (state) => state.user }) },
-=======
 import MessageList from "./MessageList.vue";
 export default {
   components: { ChatOptions, MessageList },
   name: "ChatCanvas",
-
   data() {
     return {
       msgInput: "",
       currentChat: "",
     };
   },
->>>>>>> victor/chat
   methods: {
-    ...mapMutations("user", ["setUserName", "setUserInfo"]),
     sendMessage() {
-<<<<<<< HEAD
-      console.log("Sending a message " + this.msgInput);
-      this.$socket.emit(
-        "add message to chat",
-        this.msgInput,
-        this.$store.state.user.userName,
-        this.currentChatId
-      );
-    },
-    addMessageToUI(msg) {
-      // TODO add to the UI
-      if (msg.username === this.$store.state.user.username) {
-        console.log("from ME:" + msg.content);
-      } else {
-        console.log("from " + msg.username + ": " + msg.content);
-      }
-    },
-    updateUIWithChatMessages() {
-      const curChat = this.getChatInfo(this.currentChatId);
-      curChat.messages.forEach(this.addMessageToUI);
-    },
-    getChatInfo(chatId) {
-      return this.user.chats.find((chat) => {
-        return chat._id === chatId;
-      });
-    },
-    getChatIdx(chatId) {
-      return this.user.chats.findIndex((chat) => {
-        return chat._id === chatId;
-      });
-=======
       let payload = {
         content: this.msgInput,
         chatId: this.currentChat,
@@ -108,52 +51,13 @@ export default {
       };
       this.$socket.emit("add message to chat", payload);
       this.msgInput = "";
->>>>>>> victor/chat
     },
   },
-  created() {
-    // TODO un hardcode a username in store
-    this.setUserName("bob");
-    // retrieve chats
-    this.$socket.emit("get chats", this.$store.state.user.username);
-  },
   mounted() {
-<<<<<<< HEAD
-    this.$socket.on("user chats", (chats) => {
-      let payload = {
-        username: this.$store.state.user.username,
-        chats: chats,
-      };
-      this.setUserInfo(payload);
-      this.currentChatId = chats[0]._id;
-      // update ui
-      this.updateUIWithChatMessages();
-    });
-    this.$socket.on("message", (msgPayload, chatId) => {
-      console.log("Received message from server");
-      // add to store
-      const userInfo = this.user;
-      let updatedChatIdx = this.getChatIdx(chatId);
-      userInfo.chats[updatedChatIdx].messages[
-        userInfo.chats[updatedChatIdx].messages.length
-      ] = msgPayload;
-      this.setUserInfo(userInfo);
-      if (chatId === this.currentChatId) {
-        // add to UI
-        this.addMessageToUI(msgPayload);
-      }
-    });
-    this.$socket.on("get username", () => {
-      if (this.$store.state.user.username) {
-        this.$socket.emit("logged in", this.$store.state.user.username);
-      }
-=======
     this.$socket.on("add message to chat", (payload) => {
       // TODO display
       console.log(payload);
->>>>>>> victor/chat
     });
-
     bus.$on("chat-click", (chatId) => {
       if (this.currentChat != chatId) {
         this.currentChat = chatId;
@@ -178,34 +82,28 @@ ul::-webkit-scrollbar {
   display: block;
   padding: 0;
 }
-
 .chat-input {
   margin: auto !important;
   width: 97% !important;
 }
-
 .form-control {
   border-radius: 30px !important;
   box-shadow: 0px 5px 5px 0px rgb(180, 180, 180) !important;
   background-color: #f4fbff !important;
 }
-
 .container {
   margin: auto !important;
   height: 100% !important;
 }
-
 .chat-display {
   margin: auto !important;
   height: 85% !important;
 }
-
 @media screen and (max-width: 1000px) {
   .chat-options {
     visibility: hidden !important;
   }
 }
-
 .chat-options {
   visibility: visible;
   color: #0d1b2a;
