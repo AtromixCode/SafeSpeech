@@ -185,6 +185,9 @@ io.on("connection", (socket) => {
   socket.on("get chats", async (userName) => {
     io.to(socket.id).emit("user chats", await getChats(userName));
   });
+  socket.on("create chat", async (chatTitle, messages, users) => {
+    await createChat(chatTitle, messages, users);
+  })
 
   socket.on("set pubkey", (obj)=>{
     console.log(obj);
