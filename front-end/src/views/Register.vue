@@ -96,15 +96,17 @@
                 v-model="input.password_confirm"
                 placeholder="Confirm password"
               />
-              <router-link to="/"> Have an account? Login here! </router-link>
+              <router-link to="/">Have an account? Login here!</router-link>
             </div>
             <button type="button" class="btn btn-dark" v-on:click="register()">
               Register
             </button>
-            <button type="button" class="btn btn-light">Cancel</button>
+            <button type="button" class="btn btn-light" v-on:click="register()">
+              Cancel
+            </button>
           </div>
         </div>
-        <div class="col"><img src="../assets/Mobile.svg" height="220vh" /></div>
+        <div class="row"><img src="../assets/Mobile.svg" height="220vh" /></div>
       </div>
       <img
         src="../assets/leftCircle.svg"
@@ -151,7 +153,8 @@ export default {
   data() {
     return {
       showModal: false,
-      avatar_preview: "/img/ProfilePicture1.b2c1f36d.svg",
+      selected_avatar: "ProfilePicture1.svg",
+      avatar_preview: require("../assets/ProfilePicture1.svg"),
       input: {
         username: "",
         password: "",
@@ -170,7 +173,7 @@ export default {
      * @param avatar the path to the avatar image
      */
     saveAvatar(avatar) {
-      this.avatar_preview = avatar;
+      this.avatar_preview = require("../assets/" + avatar);
       this.selected_avatar = avatar;
     },
     /**
@@ -185,6 +188,7 @@ export default {
       ) {
         let username = this.input.username;
         let password = this.input.password;
+        let pfp = this.selected_avatar;
         await bcrypt.genSalt(saltRounds, (err, salt) => {
           bcrypt.hash(password, salt, (err, salt) => {
             if (err) {
@@ -194,6 +198,7 @@ export default {
             this.$socket.emit("register user", {
               username: username,
               password: salt,
+              pfp: pfp,
             });
           });
         });
