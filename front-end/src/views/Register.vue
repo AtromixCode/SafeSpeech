@@ -139,8 +139,8 @@
 
 <script>
 import Modal from "./AvatarSelectionModal.vue";
-//import bcrypt from "bcryptjs";
-//const saltRounds = 10;
+import bcrypt from "bcryptjs";
+const saltRounds = 10;
 
 export default {
   name: "RegisterView",
@@ -166,7 +166,7 @@ export default {
       this.avatar_preview = avatar;
       this.selected_avatar = avatar;
     },
-    register() {
+    async register() {
       if (
         this.input.username != "" &&
         this.input.password != "" &&
@@ -174,20 +174,18 @@ export default {
       ) {
         let username = this.input.username;
         let password = this.input.password;
-        /*bcrypt.genSalt(saltRounds, function (err, salt) {
-          bcrypt.hash(password, salt, function (err, salt) {
+        await bcrypt.genSalt(saltRounds, (err, salt) => {
+          bcrypt.hash(password, salt, (err, salt) => {
             if (err) {
               console.log(salt);
               console.log(err);
             }
+            this.$socket.emit("check new login", {
+              userName: username,
+              password: salt,
+            });
           });
-        });*/
-        // store saltedHash and username in DB
-        this.$socket.emit("check new login", {
-          userName: username,
-          password: password,
         });
-        // route to chat page
       } else {
         console.log("A username and password must be present");
       }
