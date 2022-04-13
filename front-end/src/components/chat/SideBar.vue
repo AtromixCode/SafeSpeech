@@ -39,7 +39,7 @@
           <b-row>
             <b-col md="auto">
               <b-button
-                v-b-modal.modal-1
+                v-b-modal.modal
                 style="color: white; font-size: 1.25rem"
                 variant="something"
                 aria-label="logout"
@@ -52,7 +52,8 @@
         <chat-list :buttonList="buttons" />
       </template>
     </b-sidebar>
-    <b-modal id="modal-1" title="BootstrapVue" hide-footer>
+
+    <b-modal id="modal" title="BootstrapVue" hide-footer>
       <div class="form-control">
         <input
           type="text"
@@ -61,10 +62,22 @@
         />
       </div>
       <div class="col-md-12 text-center">
-        <button type="button" class="btn btn-dark" v-on:click="createNewChat()">
+        <b-button
+          type="button"
+          class="btn btn-dark"
+          block
+          v-on:click="createNewChat()"
+        >
           Add
-        </button>
-        <button type="button" class="btn btn-light">Cancel</button>
+        </b-button>
+        <b-button
+          type="button"
+          class="btn btn-light"
+          block
+          @click="$bvModal.hide('modal')"
+        >
+          Cancel
+        </b-button>
       </div>
     </b-modal>
   </div>
@@ -102,7 +115,12 @@ export default {
           [],
           [this.user.username, this.input.friends_username]
         );
+        this.$bvModal.hide("modal");
       }
+    },
+    closeModal() {
+      this.$bvModal.hide("modal");
+      console.log("close the fuckin thing");
     },
   },
 };
