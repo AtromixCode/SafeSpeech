@@ -1,9 +1,10 @@
 <template>
   <b-container>
-    <b-row
-      ><div class="header">
-        <chat-options class="chat-options" style="float: right" /></div
-    ></b-row>
+    <b-row>
+      <div class="header">
+        <chat-options class="chat-options" style="float: right" />
+      </div>
+    </b-row>
     <b-row class="chat-display"></b-row>
     <b-row>
       <div class="chat-input-div">
@@ -32,13 +33,14 @@
 <script>
 import ChatOptions from "./ChatOptions.vue";
 import { mapMutations, mapState } from "vuex";
+
 export default {
   name: "ChatCanvas",
   components: { ChatOptions },
   data() {
     return {
       msgInput: "",
-      currentChat: "testChat",
+      currentChatId: "",
     };
   },
   computed: { ...mapState({ user: (state) => state.user }) },
@@ -47,10 +49,26 @@ export default {
     sendMessage() {
       let payload = {
         content: this.msgInput,
-        chatId: this.currentChat,
+        chatId: this.currentChatId,
         from: this.$store.state.user.userName,
       };
       this.$socket.emit("message", payload);
+    },
+    addMessageToUI(msg) {
+      // TODO add to the UI
+      console.log(msg.content);
+      if (msg.username === this.$store.state.user.username) {
+        console.log("from ME");
+      } else {
+        console.log(msg.username);
+      }
+    },
+    updateUIWithChatMessages() {
+      const curChat = this.user.chats.find((chat) => {
+        return chat._id === this.currentChatId;
+      });
+      // console.log(curChat);
+      curChat.messages.forEach(this.addMessageToUI);
     },
   },
   created() {
@@ -66,8 +84,9 @@ export default {
         chats: chats,
       };
       this.setUserInfo(payload);
-      console.log(payload);
-      console.log(this.user);
+      this.currentChatId = chats[0]._id;
+      // update ui
+      this.updateUIWithChatMessages();
     });
   },
 };
