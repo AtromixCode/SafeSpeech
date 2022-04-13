@@ -1,8 +1,22 @@
 require("dotenv").config();
-/*
+/**
+ Main server file, allows interaction with the MongoDB with credentials in the .env file.
+ Handles communicating to the children and handling talking between the children.
 
+ MongoDB specs:
+  users collection:
+    username: "" // unique key
+    password: ""
+    ... other data
+  chats collection:
+    chatTitle: ""
+    messages: [...{content: "", username: "", timestamp: Date}]
+    participants: [...{username: "", ...other info}]
+
+ Author(s):
+ Victor Sanchez
+ Jean-David Rousseau
  */
-
 const app = require("express")();
 const http = require("http").Server(app);
 const io = require("socket.io")(http, {
@@ -20,7 +34,10 @@ const {json} = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
 
-/**/
+/**
+ * Adds a user to the database.
+ * user: {username: "", password: "", ..other info}
+ */
 async function addUser(user) {
   try {
     await client.connect();
@@ -33,14 +50,14 @@ async function addUser(user) {
     console.log(e.message);
   }
 }
-async function getUser(username){
-  await client.connect();
-  let query = { username: username };
-  return await client
-      .db("safe_speech")
-      .collection("users")
-      .findOne(query);
-}
+
+/**
+ * Adds a chat to the DB.
+ * @param chatTitle: name of the chat
+ * @param messages: list of messages in the chat, in [...{content: "", username: "", timestamp: Date}] format
+ * @param participants: list of participants in the chat, in user format (passwords omitted)
+ * @returns nothing
+ */
 async function createChat(chatTitle, messages, participants){
   try {
     await client.connect();
@@ -59,23 +76,13 @@ async function createChat(chatTitle, messages, participants){
   }
 }
 
-async function getUserChats(username){
-  await client.connect();
-  let query = {participants: {username: username}};
-  const cursor = await client
-      .db("safe_speech")
-      .collection("chats")
-      .find(query);
-  return await cursor.toArray();
-}
-async function getChat(chatId){
-  await client.connect();
-  let query = {_id: chatId};
-  return await client
-      .db("safe_speech")
-      .collection("chats")
-      .findOne(query);
-}
+/**
+ * Adds a message to the specified chat.
+ * @param content the message's text
+ * @param sender the username of the user who sent it
+ * @param chatId the chat ID to which this message will be appended
+ * @returns nothing.
+ */
 async function addMessageToChat(content, sender, chatId){
   try {
     await client.connect();
@@ -93,18 +100,76 @@ async function addMessageToChat(content, sender, chatId){
   }
 }
 
+/**
+ * Gets a user object with the username provided.
+ * @param username the username to query for.
+ * @returns {Promise<Document & {_id: InferIdType<Document>}>} that represents the user, or null.
+ */
+async function getUser(username){
+  await client.connect();
+  let query = { username: username };
+  return await client
+      .db("safe_speech")
+      .collection("users")
+      .findOne(query);
+}
+
+/**
+ * Gets all the chats in which the user is listed as a participant.
+ * @param username the username to query for.
+ * @returns {Promise<WithId<Document>[]>} list of all chats in which the user is listed as a participant.
+ */
+async function getUserChats(username){
+  await client.connect();
+  let query = {participants: {username: username}};
+  const cursor = await client
+      .db("safe_speech")
+      .collection("chats")
+      .find(query);
+  return await cursor.toArray();
+}
+
+/**
+ * Gets a chat with the matching chat ID.
+ * @param chatId the chat ID to query for.
+ * @returns {Promise<Document & {_id: InferIdType<Document>}>} the chat with the matching ID.
+ */
+async function getChat(chatId){
+  await client.connect();
+  let query = {_id: chatId};
+  return await client
+      .db("safe_speech")
+      .collection("chats")
+      .findOne(query);
+}
+
+/**
+ * Functions to handle a connection
+ */
 io.on("connection", (socket) => {
   console.log("Connection started");
   // TODO on disconnect remove socket from map
+  /**
+   * Retrieves user with specified username and sends it to the requesting socket.
+   */
   socket.on("get user", async (username) => {
     io.to(socket.id).emit("user info", await getUser(username));
   });
+  /**
+   * Retrieves chats where user with username is listed as a participant and sends it to the requesting socket.
+   */
   socket.on("get chats", async (userName) => {
     io.to(socket.id).emit("user chats", await getUserChats(userName));
   });
+  /**
+   * Creates a chat with the specified information in the DB.
+   */
   socket.on("create chat", async (chatTitle, messages, users) => {
     await createChat(chatTitle, messages, users);
   })
+  /**
+   * Adds a message to the specified chat, and pushes the new message to all chat participants.
+   */
   socket.on("add message to chat", async (content, sender, chatId) => {
     // assuming you get just the string otherwise ObjectId not necessary
     await addMessageToChat(content, sender, ObjectId(chatId));
@@ -114,23 +179,34 @@ io.on("connection", (socket) => {
     users.forEach((user)=>{
       let socketId = userSocketIds.get(user.username);
       if(socketId){
-        io.to(socketId).emit("message", content)
+        io.to(socketId).emit("message", content, sender, chatId);
       }
     });
   });
-
+  /**
+   * Sets the public key for a username
+   */
   socket.on("set pubkey", (obj)=>{
     console.log(obj);
     userKeys.set(obj.user, obj.key);
     console.log(userKeys.get(obj.user));
   });
+  /**
+   * Gets the public key for a username
+   */
   socket.on("get pubkey", (obj)=>{
     console.log("Pub key request for "+obj.user);
     let pubKey = {user: obj.user, pubKey: userKeys.get(obj.user)};
     console.log(pubKey);
     io.to(socket.id).emit("pubkey", pubKey);
   });
+  /**
+   * Sets a username as logged in
+   */
   socket.on("logged in", (username) => {userSocketIds.set(username, socket.id);})
+  /**
+   * Attempts to register a user with the given credentials.
+   */
   socket.on("register user", async (credentials) => {
     const user = await getUser(credentials.username);
     if (user){
@@ -146,6 +222,9 @@ io.on("connection", (socket) => {
   });
 });
 
+/**
+ * Starts a server at the port
+ */
 http.listen(port, () => {
   console.log(`Socket.IO server running at http://localhost:${port}/`);
 });
