@@ -66,13 +66,14 @@
               <router-link to="/register">
                 No Account? Register here!
               </router-link>
-              <button type="button" class="btn btn-light" v-on:click="login()">
-                Cancel
-              </button>
             </div>
+            <button type="button" class="btn btn-dark" v-on:click="login()">
+              Login
+            </button>
+            <button type="button" class="btn btn-light">Cancel</button>
           </div>
         </div>
-        <div class="col"><img src="../assets/Mobile.svg" height="220vh" /></div>
+        <div class="row"><img src="../assets/Mobile.svg" height="220vh" /></div>
         <div>
           <img
             src="../assets/leftCircle.svg"
