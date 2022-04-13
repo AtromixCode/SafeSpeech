@@ -12,8 +12,13 @@ const mongoPass = process.env.MONGO_PASS;
 const port = 8000;
 let userKeys = new Map();
 const { MongoClient, ServerApiVersion } = require("mongodb");
+const {json} = require("express");
 const uri = `mongodb+srv://${mongoUser}:${mongoPass}@cluster0.yiun1.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri);
+const today = new Date();
+const tomorrow = new Date();
+// Add 1 Day
+tomorrow.setDate(today.getDate() + 2);
 
 async function addUser(user, socket) {
   try {
@@ -37,12 +42,6 @@ async function addUser(user, socket) {
     }
   }
 }
-const today = new Date();
-const tomorrow = new Date();
-
-// Add 1 Day
-tomorrow.setDate(today.getDate() + 2);
-
 async function addMessage(userName, message, chatId) {
   try {
     await client.connect();
@@ -97,7 +96,6 @@ async function checkUsernameExists(user, socket) {
     //await client.close();
   }
 }
-
 async function checkLoginCredentials(user, socket) {
   try {
     await client.connect();
@@ -139,6 +137,38 @@ async function checkLoginCredentials(user, socket) {
     //await client.close();
   }
 }
+async function createChat(chatTitle, messages, participants){
+  try {
+    await client.connect();
+    const result = await client
+        .db("safe_speech")
+        .collection("chats").insertOne({
+          chatTitle: chatTitle,
+          messages: messages,
+          participants: participants
+        })
+    console.log(result);
+  } catch (e) {
+    console.log(e.message);
+    if (e.code === 11000) {
+      console.log(
+          "The userName is a unique index, please add handle of error so that the user knows they need another user name"
+      );
+    }
+  } finally {
+    await client.close();
+  }
+}
+
+async function getChats(username){
+  await client.connect();
+  let query = {participants: {username: username}};
+  const cursor = await client
+      .db("safe_speech")
+      .collection("chats")
+      .find(query);
+  return await cursor.toArray();
+}
 
 io.on("connection", (socket) => {
   console.log("Connection started");
@@ -151,6 +181,11 @@ io.on("connection", (socket) => {
     io.emit("message", obj);
     // io.to(socket.id).emit("message", obj);
   });
+
+  socket.on("get chats", async (userName) => {
+    io.to(socket.id).emit("user chats", await getChats(userName));
+  });
+
   socket.on("set pubkey", (obj)=>{
     console.log(obj);
     userKeys.set(obj.user, obj.key);
@@ -177,3 +212,12 @@ io.on("connection", (socket) => {
 http.listen(port, () => {
   console.log(`Socket.IO server running at http://localhost:${port}/`);
 });
+
+//TESTS
+//
+// createChat("Test", [
+//   {content: "message1", username: "charlie", timestamp: today},
+//   {content: "message2", username: "bob", timestamp: tomorrow},
+// ], [{username: "charlie"}, {username: "bob"}])
+//
+// console.log(getChats("bob"));
