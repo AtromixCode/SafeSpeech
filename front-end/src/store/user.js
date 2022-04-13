@@ -4,7 +4,7 @@ export default {
     username: "",
     chats: [
       {
-        messages: [{ timeStamp: "", content: "", username: "" }],
+        messages: [{ timestamp: "", content: "", username: "" }],
         participants: [{ username: "" }],
         chatTitle: "",
         _id: "",

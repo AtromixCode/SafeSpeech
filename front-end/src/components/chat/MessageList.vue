@@ -1,15 +1,17 @@
 <template>
-  <div>
-    <message
-      v-for="(message, idx) in messages"
-      :msg="message.content"
-      :time="message.timeStamp"
-      :userMessage="user.userName === message.from"
-      :username="message.from"
-      :key="idx"
-    >
-      {{ message }}
-    </message>
+  <div class="messages-container">
+    <div class="inner">
+      <message
+        v-for="(message, idx) in messages"
+        :msg="message.content"
+        :time="message.timestamp"
+        :userMessage="user.username === message.username"
+        :username="message.username"
+        :key="idx"
+      >
+        {{ message }}
+      </message>
+    </div>
   </div>
 </template>
 
@@ -51,4 +53,13 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.messages-container {
+  height: 95%;
+  padding-right: 20px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  height: 100%;
+}
+</style>

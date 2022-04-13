@@ -3,7 +3,6 @@
     <nav>
       <ul>
         <b-button
-          v-b-toggle.sidebar-1
           v-for="chat in user.chats"
           v-bind:pressed="chat._id === currentChat"
           :key="chat._id"
@@ -36,17 +35,17 @@ export default {
   },
   methods: {
     onClick(chatId) {
-      const isNotClickedButton = (chat) => {
-        return chat.id != chatId;
-      };
-      const isClickedButton = (chat) => {
-        return chat.id === chatId;
-      };
-      this.buttons.filter(isNotClickedButton).forEach((notClickedButton) => {
-        notClickedButton.highlighted = false;
-      });
+      // const isNotClickedButton = (chat) => {
+      //   return chat._id != chatId;
+      // };
+      // const isClickedButton = (chat) => {
+      //   return chat._id === chatId;
+      // };
+      // this.buttons.filter(isNotClickedButton).forEach((notClickedButton) => {
+      //   notClickedButton.highlighted = false;
+      // });
 
-      this.buttons.find(isClickedButton).highlighted = true;
+      // this.user.chats.find(isClickedButton).highlighted = true;
       bus.$emit("chat-click", chatId);
       bus.$emit("chat-click", chatId);
       this.$forceUpdate();

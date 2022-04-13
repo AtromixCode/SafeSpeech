@@ -4,7 +4,7 @@
       <p>
         <font>{{ username }}</font>
       </p>
-      <p style="background: LightBlue; border-radius: 5px; padding: 5px">
+      <p style="background: #2a8bf2; border-radius: 5px; padding: 5px">
         {{ msg }}
       </p>
       <font
@@ -12,12 +12,12 @@
       >
     </div>
   </div>
-  <div style="display: flex; justify-content: flex-end" v-else>
+  <div style="display: flex; justify-content: flex-end" class="py-2" v-else>
     <div style="display: flex; flex-direction: column">
       <p>
         <font>{{ username }}</font>
       </p>
-      <p style="background: LightSkyBlue; border-radius: 5px; padding: 5px">
+      <p style="background: #00bd9d; border-radius: 5px; padding: 5px">
         {{ msg }}
       </p>
       <font

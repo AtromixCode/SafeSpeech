@@ -1,20 +1,11 @@
 <template>
-  <b-container>
+  <b-container class="chat-canvas-container">
     <b-row>
       <div class="header">
         <chat-options class="chat-options" style="float: right" />
       </div>
     </b-row>
-    <!--    <b-row class="chat-display">-->
-    <!--      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">-->
-    <!--        {{ msg.content }} - {{ idx }}-->
-    <!--      </li>-->
-    <!--    </b-row>-->
-    <b-row
-      ><div class="header">
-        <chat-options class="chat-options" style="float: right" /></div
-    ></b-row>
-    <b-row class="chat-display"><message-list /></b-row>
+    <b-row class="chat-container"><message-list class="chat-display" /></b-row>
     <b-row>
       <div class="chat-input-div">
         <b-input-group class="chat-input">
@@ -65,9 +56,10 @@ export default {
       this.$socket.emit(
         "add message to chat",
         this.msgInput,
-        this.$store.state.user.userName,
+        this.$store.state.user.username,
         this.currentChatId
       );
+      this.msgInput = "";
     },
     addMessageToUI(msg) {
       // TODO add to the UI
@@ -172,19 +164,33 @@ ul::-webkit-scrollbar {
   height: 100% !important;
 }
 
-.chat-display {
-  margin: auto !important;
-  height: 85% !important;
-}
-
 @media screen and (max-width: 1000px) {
   .chat-options {
     visibility: hidden !important;
+  }
+  .header {
+    height: 0 !important;
+  }
+  .chat-container {
+    height: 90% !important;
   }
 }
 
 .chat-options {
   visibility: visible;
   color: #0d1b2a;
+}
+.chat-canvas-container .row {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.chat-display {
+  margin: auto !important;
+  width: 97% !important;
+}
+
+.chat-container {
+  height: 85%;
 }
 </style>

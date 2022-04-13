@@ -42,11 +42,12 @@ export default {
 @media screen and (max-width: 1000px) {
   .side-bar {
     width: 100%;
-    height: 6%;
+    height: 6vh;
   }
   .chat-canvas {
     width: 100%;
     height: 94%;
+    margin-top: 6vh;
     margin-left: 0;
   }
 }
