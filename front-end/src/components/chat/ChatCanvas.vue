@@ -6,7 +6,7 @@
       </div>
     </b-row>
     <b-row class="chat-display">
-      <li v-for="(msg, idx) in messages" :key="idx">
+      <li v-for="(msg, idx) in messages" :key="idx" style="color: black">
         {{ msg.content }} - {{ idx }}
       </li>
     </b-row>
