@@ -61,13 +61,46 @@ export default {
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo"]),
     ...mapMutations("key", ["setKey", "resetState"]),
-    sendMessage() {
+    async sendMessage() {
       console.log("Sending a message " + this.msgInput);
+      let encryptionResult = await this.encrypt(this.msgInput);
+      console.log(encryptionResult);
       this.$socket.emit(
         "add message to chat",
-        this.msgInput,
+        encryptionResult.encryptedString,
         this.$store.state.user.userName,
-        this.currentChatId
+        this.currentChatId,
+        encryptionResult.counter
+      );
+    },
+    async encrypt(string) {
+      console.log("Encrypting");
+      console.log(string);
+      let enc = new TextEncoder();
+      let encoded = enc.encode(string);
+      let counter = window.crypto.getRandomValues(new Uint8Array(16));
+      let encryptedString = await window.crypto.subtle.encrypt(
+        {
+          name: "AES-CTR",
+          counter,
+          length: 128,
+        },
+        this.$store.state.key.key,
+        encoded
+      );
+      console.log(encryptedString);
+      return { counter: counter, encryptedString: encryptedString };
+    },
+    async decrypt(encryptedString, counter) {
+      console.log("Decrypting");
+      return window.crypto.subtle.decrypt(
+        {
+          name: "AES-CTR",
+          counter,
+          length: 128,
+        },
+        this.$store.state.key.key,
+        encryptedString
       );
     },
     addMessageToUI(msg) {
@@ -111,14 +144,24 @@ export default {
       // update ui
       this.updateUIWithChatMessages();
     });
-    this.$socket.on("message", (msgPayload, chatId) => {
+    this.$socket.on("message", async (msgPayload, chatId) => {
       console.log("Received message from server");
+      // decrypt if necessary
+      if (msgPayload.counter) {
+        const decoder = new TextDecoder();
+        let bytestream = await this.decrypt(
+          msgPayload.content,
+          msgPayload.counter
+        );
+        msgPayload.content = decoder.decode(bytestream);
+      }
       // add to store
       const userInfo = this.user;
       let updatedChatIdx = this.getChatIdx(chatId);
       userInfo.chats[updatedChatIdx].messages[
         userInfo.chats[updatedChatIdx].messages.length
       ] = msgPayload;
+
       this.setUserInfo(userInfo);
       if (chatId === this.currentChatId) {
         // add to UI

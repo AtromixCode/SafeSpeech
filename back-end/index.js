@@ -173,9 +173,9 @@ io.on("connection", (socket) => {
   /**
    * Adds a message to the specified chat, and pushes the new message to all chat participants.
    */
-  socket.on("add message to chat", async (content, sender, chatId) => {
+  socket.on("add message to chat", async (content, sender, chatId, counter) => {
     // assuming you get just the string otherwise ObjectId not necessary
-    let msgPayload = {content:content, username:sender, timestamp:new Date()};
+    let msgPayload = {content:content, username:sender, timestamp:new Date(), counter:counter};
     await addMessageToChat(msgPayload, ObjectId(chatId));
     // send message to all participants
     const chat = await getChat(ObjectId(chatId));
