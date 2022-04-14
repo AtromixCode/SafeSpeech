@@ -40,6 +40,7 @@
     "
   >
     <div style="margin: auto; color: black">Select a chat bro</div>
+    <b-row class="chat-container"><message-list class="chat-display" /></b-row>
   </div>
 </template>
 

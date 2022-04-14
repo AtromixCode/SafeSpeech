@@ -34,8 +34,14 @@
               /></b-button>
             </b-col>
           </b-row>
-          <b-row
-            ><span style="float: center" class="user-info">{{
+          <b-row style="float: center">
+            <div>
+              <img
+                src="@/assets/ProfilePicture1.svg"
+                style="width: 6vh; height: 6vh"
+              />
+            </div>
+            <span style="float: center" class="user-info">{{
               user.username
             }}</span></b-row
           >
@@ -67,8 +73,14 @@
             /></b-button>
           </b-col>
         </b-row>
-        <b-row
-          ><span style="float: center" class="user-info">{{
+        <b-row>
+          <div>
+            <img
+              src="@/assets/ProfilePicture1.svg"
+              style="width: 7vh; height: 7vh"
+            />
+          </div>
+          <span style="float: center" class="user-info">{{
             user.username
           }}</span></b-row
         >
