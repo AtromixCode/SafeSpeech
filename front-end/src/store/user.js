@@ -20,6 +20,16 @@ export default {
       Object.entries(userInfo).forEach(([k, v]) => {
         state[k] = v;
       });
+
+      const notUser = (username) => {
+        return username.username != state.username;
+      };
+
+      state.chats.forEach((chat) => {
+        if (chat.chatTitle === "" || chat.chatTitle === null) {
+          chat.chatTitle = chat.participants.find(notUser).username;
+        }
+      });
       return state;
     },
 
@@ -31,6 +41,12 @@ export default {
     },
 
     addChat(state, data) {
+      const notUser = (username) => {
+        return username.username != state.username;
+      };
+      if (data.chatTitle === "" || data.chatTitle === null) {
+        data.chatTitle = data.chat.participants.find(notUser).username;
+      }
       state.chats.push(data);
     },
 
@@ -44,14 +60,13 @@ export default {
 
     resetUserInfo(state) {
       let emptyState = {
-        userName: "",
-        userId: "",
+        username: "",
         chats: [
           {
-            messages: [{ timeStamp: "", content: "", from: "" }],
-            lastUpdated: "",
-            title: "",
-            members: "",
+            messages: [{ timestamp: "", content: "", username: "" }],
+            participants: [{ username: "" }],
+            chatTitle: "",
+            _id: "",
           },
         ],
       };

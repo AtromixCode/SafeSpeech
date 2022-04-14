@@ -4,7 +4,7 @@
       <message
         v-for="(message, idx) in messages"
         :msg="message.content"
-        :time="message.timestamp"
+        :time="timeString(message.timestamp)"
         :userMessage="user.username === message.username"
         :username="message.username"
         :key="idx"
@@ -41,9 +41,18 @@ export default {
       localChats = this.user.chats;
       this.messages = localChats.find(isCurrentChat).messages;
     },
+
+    timeString(timestamp) {
+      let d = new Date(timestamp).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        hour12: true,
+        minute: "numeric",
+      });
+      return d;
+    },
   },
   mounted() {
-    bus.$on("chat-click", (chatId) => {
+    bus.$on("chat-click-message-list", (chatId) => {
       if (this.currentId != chatId) {
         this.currentId = chatId;
         this.resetMessages();

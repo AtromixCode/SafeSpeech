@@ -1,22 +1,37 @@
 <template>
-  <div>
-    <nav>
-      <ul>
-        <b-button
-          v-for="chat in user.chats"
-          v-bind:pressed="chat._id === currentChat"
-          :key="chat._id"
-          :id="chat._id"
-          @click="onClick(chat._id)"
-          squared
-          variant="none"
-          class="chat-button"
-        >
-          {{ chat.chatTitle }}
-        </b-button>
-      </ul>
-    </nav>
-  </div>
+  <nav v-if="collapsable()">
+    <ul>
+      <b-button
+        v-b-toggle.sidebar-1
+        v-for="chat in user.chats"
+        v-bind:pressed="chat._id === currentChat"
+        :key="chat._id"
+        :id="chat._id"
+        @click="onClick(chat._id)"
+        squared
+        variant="none"
+        class="chat-button"
+      >
+        {{ chat.chatTitle }}
+      </b-button>
+    </ul>
+  </nav>
+  <nav v-else>
+    <ul>
+      <b-button
+        v-for="chat in user.chats"
+        v-bind:pressed="chat._id === currentChat"
+        :key="chat._id"
+        :id="chat._id"
+        @click="onClick(chat._id)"
+        squared
+        variant="none"
+        class="chat-button"
+      >
+        {{ chat.chatTitle }}
+      </b-button>
+    </ul>
+  </nav>
 </template>
 
 <script>
@@ -36,9 +51,11 @@ export default {
   methods: {
     ...mapMutations("user", ["addChat"]),
     onClick(chatId) {
-      bus.$emit("chat-click", chatId);
-      bus.$emit("chat-click", chatId);
-      this.$forceUpdate();
+      bus.$emit("chat-click-canvas", chatId);
+    },
+
+    collapsable() {
+      return this.$screen.width < 1000;
     },
   },
 
@@ -53,11 +70,15 @@ export default {
 
 <style scoped>
 nav ul {
-  height: 60vh;
+  height: 70vh;
   width: 100%;
   overflow: hidden;
   overflow-y: scroll;
   padding: 0;
+}
+
+nav {
+  padding: 0 !important;
 }
 
 nav ul button {

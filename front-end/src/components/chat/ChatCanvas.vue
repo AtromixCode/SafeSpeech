@@ -1,5 +1,5 @@
 <template>
-  <b-container class="chat-canvas-container">
+  <b-container v-if="selectedChat()" class="chat-canvas-container">
     <b-row>
       <div class="header">
         <chat-options class="chat-options" style="float: right" />
@@ -28,6 +28,20 @@
       </div>
     </b-row>
   </b-container>
+
+  <div
+    v-else
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    "
+  >
+    <div style="margin: auto; color: black">Select a chat bro</div>
+    <b-row class="chat-container"><message-list class="chat-display" /></b-row>
+  </div>
 </template>
 
 <script>
@@ -56,14 +70,19 @@ export default {
       "removeChat",
     ]),
     sendMessage() {
-      console.log("Sending a message " + this.msgInput);
-      this.$socket.emit(
-        "add message to chat",
-        this.msgInput,
-        this.$store.state.user.username,
-        this.currentChatId
-      );
-      this.msgInput = "";
+      if (this.msgInput != "") {
+        console.log("Sending a message " + this.msgInput);
+        this.$socket.emit(
+          "add message to chat",
+          this.msgInput,
+          this.$store.state.user.username,
+          this.currentChatId
+        );
+        this.msgInput = "";
+      }
+    },
+    selectedChat() {
+      return this.currentChatId != "";
     },
   },
   created() {
@@ -101,7 +120,9 @@ export default {
       this.currentChatId = "";
     });
 
-    bus.$on("chat-click", (chatId) => {
+    bus.$on("chat-click-canvas", (chatId) => {
+      bus.$emit("chat-click-message-list", chatId);
+      console.log("in canvas list");
       if (this.currentChatId != chatId) {
         this.currentChatId = chatId;
       }
