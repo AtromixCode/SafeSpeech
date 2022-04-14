@@ -49,7 +49,12 @@ export default {
     ...mapState({ user: (state) => state.user }),
   },
   methods: {
-    ...mapMutations("user", ["setUserName", "setUserInfo", "recieveMessage"]),
+    ...mapMutations("user", [
+      "setUserName",
+      "setUserInfo",
+      "recieveMessage",
+      "removeChat",
+    ]),
     sendMessage() {
       console.log("Sending a message " + this.msgInput);
       this.$socket.emit(
@@ -90,8 +95,10 @@ export default {
       let chatId = this.currentChatId;
       let username = this.$store.state.user.username;
       console.log(chatId, username);
-      this.currentChatId = "";
+
       this.$socket.emit("leave chat", { id: chatId, user: username });
+      this.removeChat(chatId);
+      this.currentChatId = "";
     });
 
     bus.$on("chat-click", (chatId) => {
