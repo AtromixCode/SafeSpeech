@@ -44,8 +44,18 @@ export default {
       const notUser = (username) => {
         return username.username != state.username;
       };
+      const notInChats = (chat) => {
+        return data._id === chat._id;
+      };
+
+      let someChat = state.chats.find(notInChats);
+
+      if (someChat != null) {
+        return;
+      }
+
       if (data.chatTitle === "" || data.chatTitle === null) {
-        data.chatTitle = data.chat.participants.find(notUser).username;
+        data.chatTitle = data.participants.find(notUser).username;
       }
       state.chats.push(data);
     },

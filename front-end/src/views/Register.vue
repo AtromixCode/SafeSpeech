@@ -175,6 +175,7 @@
  */
 import Modal from "./AvatarSelectionModal.vue";
 import bcrypt from "bcryptjs";
+import { mapMutations } from "vuex";
 const saltRounds = 10;
 
 export default {
@@ -256,12 +257,23 @@ export default {
     goToChat() {
       this.$router.push("/chat");
     },
+
+    ...mapMutations("user", [
+      "setUserName",
+      "setUserInfo",
+      "recieveMessage",
+      "removeChat",
+    ]),
   },
   mounted() {
     /**
      * server oks the username, thus go to the chat page
      */
     this.$socket.on("ok username", () => {
+      this.setUserInfo({
+        username: this.input.username,
+        pfp: this.selected_avatar,
+      });
       this.goToChat();
     });
     /**

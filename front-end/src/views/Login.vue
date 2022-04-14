@@ -157,6 +157,7 @@
  * Jean-David Rousseau
  */
 import bcrypt from "bcryptjs";
+import { mapMutations } from "vuex";
 
 export default {
   name: "LoginView",
@@ -202,6 +203,12 @@ export default {
     goToChat() {
       this.$router.push("/chat");
     },
+    ...mapMutations("user", [
+      "setUserName",
+      "setUserInfo",
+      "recieveMessage",
+      "removeChat",
+    ]),
   },
   mounted() {
     /**
@@ -217,6 +224,8 @@ export default {
           console.log("It matches!");
           this.$socket.emit("logged in", userInfo.username);
           this.goToChat();
+          this.setUserInfo(userInfo);
+          console.log(userInfo);
         }
         // if passwords do not match
         else {
