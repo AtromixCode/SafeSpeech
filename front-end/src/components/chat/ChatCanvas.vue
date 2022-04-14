@@ -40,7 +40,6 @@
     "
   >
     <div style="margin: auto; color: black">Select a chat bro</div>
-    <b-row class="chat-container"><message-list class="chat-display" /></b-row>
   </div>
 </template>
 
@@ -121,7 +120,6 @@ export default {
     });
 
     bus.$on("chat-click-canvas", (chatId) => {
-      bus.$emit("chat-click-message-list", chatId);
       console.log("in canvas list");
       if (this.currentChatId != chatId) {
         this.currentChatId = chatId;

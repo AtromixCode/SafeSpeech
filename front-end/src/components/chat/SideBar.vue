@@ -8,7 +8,7 @@
         class="open-sidebar"
         ><b-icon icon="justify"
       /></b-button>
-      <chat-options class="chat-options" style="float: right" />
+      <chat-options class="chat-options-side-bar" style="float: right" />
     </div>
     <b-sidebar
       v-if="collapsable()"
@@ -278,7 +278,7 @@ button {
 
 @media screen and (max-width: 1000px) {
   .b-sidebar {
-    position: absolute;
+    position: fixed;
     background-color: #2a8bf2 !important;
     height: 100%;
     overflow: hidden !important;
@@ -298,7 +298,7 @@ button {
     display: none !important;
   }
 
-  .chat-options {
+  .chat-options-side-bar {
     display: none !important;
   }
 }
