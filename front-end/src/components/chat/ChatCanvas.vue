@@ -86,6 +86,14 @@ export default {
       }
     });
 
+    bus.$on("leave chat", () => {
+      let chatId = this.currentChatId;
+      let username = this.$store.state.user.username;
+      console.log(chatId, username);
+      this.currentChatId = "";
+      this.$socket.emit("leave chat", { id: chatId, user: username });
+    });
+
     bus.$on("chat-click", (chatId) => {
       if (this.currentChatId != chatId) {
         this.currentChatId = chatId;

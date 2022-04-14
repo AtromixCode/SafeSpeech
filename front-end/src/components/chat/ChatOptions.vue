@@ -9,13 +9,23 @@
   >
     <template #button-content> <b-icon icon="three-dots" /></template>
     <b-dropdown-item-button class="menu-button">
-      <span class="menu-button-text"> Leave Chat </span></b-dropdown-item-button
+      <span class="menu-button-text" v-on:click="leaveChat">
+        Leave Chat
+      </span></b-dropdown-item-button
     >
   </b-dropdown>
 </template>
 
 <script>
-export default { name: "ChatOptions" };
+import { bus } from "@/main.js";
+export default {
+  name: "ChatOptions",
+  methods: {
+    leaveChat() {
+      bus.$emit("leave chat");
+    },
+  },
+};
 </script>
 
 <style>
