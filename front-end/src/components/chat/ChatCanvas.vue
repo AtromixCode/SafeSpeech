@@ -106,7 +106,6 @@ export default {
     });
 
     bus.$on("chat-click-canvas", (chatId) => {
-      bus.$emit("chat-click-message-list", chatId);
       console.log("in canvas list");
       if (this.currentChatId != chatId) {
         this.currentChatId = chatId;
@@ -149,12 +148,6 @@ ul::-webkit-scrollbar {
 }
 
 @media screen and (max-width: 1000px) {
-  .chat-options {
-    visibility: hidden !important;
-  }
-  .header {
-    height: 0 !important;
-  }
   .chat-container {
     height: 90% !important;
   }

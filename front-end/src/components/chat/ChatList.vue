@@ -51,6 +51,7 @@ export default {
   methods: {
     ...mapMutations("user", ["addChat"]),
     onClick(chatId) {
+      bus.$emit("chat-click-message-list", chatId);
       bus.$emit("chat-click-canvas", chatId);
     },
 
