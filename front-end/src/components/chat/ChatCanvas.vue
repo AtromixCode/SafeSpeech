@@ -39,7 +39,9 @@
       height: 100%;
     "
   >
-    <div style="margin: auto; color: black">Select a chat bro</div>
+    <div style="margin: auto; color: black">
+      No chat here! choose a cool chat from the side bar 😎
+    </div>
     <b-row class="chat-container"><message-list class="chat-display" /></b-row>
   </div>
 </template>
