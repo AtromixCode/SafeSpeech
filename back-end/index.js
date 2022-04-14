@@ -135,6 +135,28 @@ async function getChat(chatId) {
 }
 
 /**
+ * Removes a user from the chat.
+ * @param chatId the chat ID to query for.
+ * @param username the user that is leaving the chat
+ */
+async function leaveChat(chatId, username) {
+  try {
+    await client.connect();
+    let query = { _id: chatId };
+    let removeUser = { $pull: { participants: { username: username } } };
+    let result = await client
+      .db("safe_speech")
+      .collection("chats")
+      .findOneAndUpdate(query, removeUser);
+    console.log(result);
+  } catch (e) {
+    console.log(e.message);
+  } finally {
+    await client.close();
+  }
+}
+
+/**
  * Functions to handle a connection
  */
 io.on("connection", (socket) => {
@@ -240,6 +262,13 @@ io.on("connection", (socket) => {
       await addUser(credentials);
       userSocketIds.set(credentials.username, socket.id);
     }
+  });
+  /**
+   * Removes a user from a chat.
+   */
+  socket.on("leave chat", async (data) => {
+    console.log(data);
+    await leaveChat(ObjectId(data.id), data.user);
   });
 });
 

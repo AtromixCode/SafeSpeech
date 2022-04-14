@@ -50,6 +50,14 @@ export default {
       state.chats.push(data);
     },
 
+    removeChat(state, chatId) {
+      const deletedChat = (chat) => {
+        return chat._id != chatId;
+      };
+      const chats = state.chats.filter(deletedChat);
+      state.chats = chats;
+    },
+
     resetUserInfo(state) {
       let emptyState = {
         username: "",
