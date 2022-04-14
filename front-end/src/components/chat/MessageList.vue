@@ -52,14 +52,12 @@ export default {
     },
   },
   mounted() {
-    bus.$on("chat-click", (chatId) => {
+    bus.$on("chat-click-message-list", (chatId) => {
       if (this.currentId != chatId) {
         this.currentId = chatId;
         this.resetMessages();
       }
     });
-
-    console.log(typeof this.user.chats[0].messages[0].timestamp);
   },
 };
 </script>
