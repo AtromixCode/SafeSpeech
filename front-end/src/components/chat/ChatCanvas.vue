@@ -1,5 +1,5 @@
 <template>
-  <b-container class="chat-canvas-container">
+  <b-container v-if="selectedChat()" class="chat-canvas-container">
     <b-row>
       <div class="header">
         <chat-options class="chat-options" style="float: right" />
@@ -28,6 +28,19 @@
       </div>
     </b-row>
   </b-container>
+
+  <div
+    v-else
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+    "
+  >
+    <div style="margin: auto; color: black">Select a chat bro</div>
+  </div>
 </template>
 
 <script>
@@ -51,14 +64,19 @@ export default {
   methods: {
     ...mapMutations("user", ["setUserName", "setUserInfo", "recieveMessage"]),
     sendMessage() {
-      console.log("Sending a message " + this.msgInput);
-      this.$socket.emit(
-        "add message to chat",
-        this.msgInput,
-        this.$store.state.user.username,
-        this.currentChatId
-      );
-      this.msgInput = "";
+      if (this.msgInput != "") {
+        console.log("Sending a message " + this.msgInput);
+        this.$socket.emit(
+          "add message to chat",
+          this.msgInput,
+          this.$store.state.user.username,
+          this.currentChatId
+        );
+        this.msgInput = "";
+      }
+    },
+    selectedChat() {
+      return this.currentChatId != "";
     },
   },
   created() {

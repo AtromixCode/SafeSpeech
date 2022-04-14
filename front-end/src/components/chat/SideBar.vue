@@ -5,11 +5,13 @@
         v-b-toggle.sidebar-1
         style="float: left; color: white; font-size: 1.25rem"
         variant="something"
+        class="open-sidebar"
         ><b-icon icon="justify"
       /></b-button>
       <chat-options class="chat-options" style="float: right" />
     </div>
     <b-sidebar
+      v-if="collapsable()"
       id="sidebar-1"
       title="Sidebar"
       bg-variant="none"
@@ -38,21 +40,51 @@
             }}</span></b-row
           >
           <b-row>
-            <b-col md="auto">
-              <b-button v-b-modal.modal variant="something">
-                <img src="../../assets/NewUser.svg" />
+            <div>
+              <b-button v-b-modal.modal variant="something" class="chat-btn">
+                <img src="../../assets/NewUser.svg" class="chat-btn-icon" />
               </b-button>
-            </b-col>
-            <b-col md="auto">
-              <b-button v-b-modal.modal-1 variant="something">
-                <img src="../../assets/GroupChat.svg" />
+              <b-button v-b-modal.modal-1 variant="something" class="chat-btn">
+                <img src="../../assets/GroupChat.svg" class="chat-btn-icon" />
               </b-button>
-            </b-col>
+            </div>
           </b-row>
+          <b-row><chat-list /></b-row>
         </b-container>
-        <chat-list :buttonList="buttons" />
       </template>
     </b-sidebar>
+
+    <div v-else>
+      <b-container>
+        <b-row class="justify-content-md-end">
+          <b-col md="auto">
+            <b-button
+              style="float: right; color: white; font-size: 1.25rem"
+              variant="something"
+              aria-label="logout"
+              v-on:click="logout"
+              ><b-icon icon="door-open"
+            /></b-button>
+          </b-col>
+        </b-row>
+        <b-row
+          ><span style="float: center" class="user-info">{{
+            user.username
+          }}</span></b-row
+        >
+        <b-row>
+          <div>
+            <b-button v-b-modal.modal variant="something" class="chat-btn">
+              <img src="../../assets/NewUser.svg" class="chat-btn-icon" />
+            </b-button>
+            <b-button v-b-modal.modal-1 variant="something" class="chat-btn">
+              <img src="../../assets/GroupChat.svg" class="chat-btn-icon" />
+            </b-button>
+          </div>
+        </b-row>
+        <b-row><chat-list /></b-row>
+      </b-container>
+    </div>
 
     <b-modal id="modal" title="BootstrapVue" hide-footer>
       <div class="form-control">
@@ -153,6 +185,9 @@ export default {
     },
   },
   methods: {
+    collapsable() {
+      return this.$screen.width < 1000;
+    },
     createNewChat() {
       if (this.input.friends_username != "") {
         let participants = [];
@@ -250,5 +285,33 @@ button {
     width: 100% !important;
     z-index: 9 !important;
   }
+
+  .chat-btn-icon,
+  .chat-btn {
+    width: 12vh !important;
+    height: 12vh !important;
+  }
+}
+
+@media screen and (min-width: 1001px) {
+  .open-sidebar {
+    display: none !important;
+  }
+
+  .chat-options {
+    display: none !important;
+  }
+}
+
+.chat-btn {
+  padding: 0 !important;
+  margin: 12px !important;
+  border: 0 !important;
+}
+
+.chat-btn-icon,
+.chat-btn {
+  width: 7vw;
+  height: 7vw;
 }
 </style>
