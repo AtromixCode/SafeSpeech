@@ -86,8 +86,6 @@ export default {
     },
   },
   created() {
-    // TODO un hardcode a username in store
-    this.setUserName("bob");
     // retrieve chats
     this.$socket.emit("get chats", this.$store.state.user.username);
   },
