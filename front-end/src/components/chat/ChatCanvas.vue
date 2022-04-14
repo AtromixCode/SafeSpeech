@@ -93,7 +93,7 @@ export default {
     },
     async decrypt(encryptedString, counter) {
       console.log("Decrypting");
-      return window.crypto.subtle.decrypt(
+      return await window.crypto.subtle.decrypt(
         {
           name: "AES-CTR",
           counter,
@@ -134,7 +134,24 @@ export default {
     this.$socket.emit("get chats", this.$store.state.user.username);
   },
   mounted() {
-    this.$socket.on("user chats", (chats) => {
+    this.$socket.on("user chats", async (chats) => {
+      console.log(chats);
+      // decrypt all messages in the chats
+      for (let i in chats) {
+        for (let j in chats[i].messages) {
+          if (chats[i].messages[j].counter) {
+            const decoder = new TextDecoder();
+            console.log(chats[i].messages[j]);
+            let bytestream = await this.decrypt(
+              chats[i].messages[j].content,
+              chats[i].messages[j].counter
+            );
+            chats[i].messages[j].content = decoder.decode(bytestream);
+            console.log("Decrypted: " + chats[i].messages[j].content);
+          }
+        }
+      }
+
       let payload = {
         username: this.$store.state.user.username,
         chats: chats,
@@ -146,6 +163,7 @@ export default {
     });
     this.$socket.on("message", async (msgPayload, chatId) => {
       console.log("Received message from server");
+      console.log(msgPayload);
       // decrypt if necessary
       if (msgPayload.counter) {
         const decoder = new TextDecoder();
@@ -183,6 +201,7 @@ export default {
         ["encrypt", "decrypt"]
       );
       this.setKey(kkey);
+      console.log("Received Key from server");
     });
     bus.$on("chat-click", (chatId) => {
       if (this.currentChat != chatId) {

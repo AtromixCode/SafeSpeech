@@ -143,7 +143,17 @@ async function getChat(chatId){
       .collection("chats")
       .findOne(query);
 }
-
+function fixBinaryMessages(chats){
+  for (let i in chats){
+    for (let j in chats[i].messages){
+      if (chats[i].messages[j].counter){
+        chats[i].messages[j].content = chats[i].messages[j].content.buffer;
+        chats[i].messages[j].counter = chats[i].messages[j].counter.buffer;
+      }
+    }
+  }
+  return chats;
+}
 /**
  * Functions to handle a connection
  */
@@ -162,7 +172,10 @@ io.on("connection", (socket) => {
    * Retrieves chats where user with username is listed as a participant and sends it to the requesting socket.
    */
   socket.on("get chats", async (userName) => {
-    io.to(socket.id).emit("user chats", await getUserChats(userName));
+    let uc = await getUserChats(userName);
+    // go through all messages and convert buffer objects to buffers
+    let fc = fixBinaryMessages(uc)
+    io.to(socket.id).emit("user chats", fc);
   });
   /**
    * Creates a chat with the specified information in the DB.
@@ -176,6 +189,7 @@ io.on("connection", (socket) => {
   socket.on("add message to chat", async (content, sender, chatId, counter) => {
     // assuming you get just the string otherwise ObjectId not necessary
     let msgPayload = {content:content, username:sender, timestamp:new Date(), counter:counter};
+    console.log(msgPayload);
     await addMessageToChat(msgPayload, ObjectId(chatId));
     // send message to all participants
     const chat = await getChat(ObjectId(chatId));
