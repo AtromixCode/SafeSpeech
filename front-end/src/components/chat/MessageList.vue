@@ -72,4 +72,8 @@ export default {
   flex-direction: column-reverse;
   height: 100%;
 }
+
+.messages-container::-webkit-scrollbar {
+  display: none;
+}
 </style>

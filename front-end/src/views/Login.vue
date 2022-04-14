@@ -3,11 +3,11 @@
     <div class="container">
       <div class="row">
         <div class="col">
-          <img src="../assets/Logo.svg" />
+          <img src="../assets/Logo.svg" class="mt-3" />
 
-          <div id="login">
-            <div class="form-control">
-              <input
+          <div id="login" class="login">
+            <div>
+              <b-form-input
                 type="text"
                 id="username"
                 name="username"
@@ -15,39 +15,70 @@
                 placeholder="Username"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password"
                 name="password"
                 v-model="input.password"
                 placeholder="Password"
+                class="mb-2"
               />
               <router-link to="/register">
                 No Account? Register here!
               </router-link>
             </div>
-            <button type="button" class="btn btn-dark" v-on:click="login()">
+
+            <b-button
+              pill
+              variant="dark"
+              class="px-5 mx-4"
+              v-on:click="login()"
+            >
               Login
-            </button>
-            <button type="button" class="btn btn-light">Cancel</button>
+            </b-button>
+            <b-button
+              pill
+              variant="outline-dark"
+              type="button"
+              class="btn btn-light px-5 mx-4"
+              v-on:click="login()"
+            >
+              Cancel
+            </b-button>
           </div>
+          <b-alert
+            variant="danger"
+            dismissible
+            fade
+            :show="showDismissibleAlert"
+            @dismissed="showDismissibleAlert = false"
+          >
+            {{ this.errorText }}
+          </b-alert>
         </div>
         <div class="col"></div>
-        <div class="col"><img src="../assets/Mobile.svg" /></div>
+        <div class="col">
+          <img src="../assets/Mobile.svg" style="margin-top: 30%" />
+        </div>
       </div>
       <img src="../assets/leftCircle.svg" class="bottomleft" />
       <img src="../assets/rightCircle.svg" class="bottomright" />
     </div>
   </div>
   <div v-else>
-    <div class="containermobile">
+    <div class="containermobile login">
       <div class="row">
         <div class="col">
-          <img src="../assets/Logo.svg" width="70%" height="auto" />
+          <img
+            src="../assets/Logo.svg"
+            width="70%"
+            height="auto"
+            class="mt-3"
+          />
           <div id="loginmobile">
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="text"
                 id="username"
                 name="username"
@@ -55,25 +86,49 @@
                 placeholder="Username"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password"
                 name="password"
                 v-model="input.password"
                 placeholder="Password"
+                class="mb-2"
               />
               <router-link to="/register">
                 No Account? Register here!
               </router-link>
             </div>
-            <button type="button" class="btn btn-dark" v-on:click="login()">
+            <b-button pill variant="dark" class="px-5 m-2" v-on:click="login()">
               Login
-            </button>
-            <button type="button" class="btn btn-light">Cancel</button>
+            </b-button>
+            <b-button
+              pill
+              variant="outline-dark"
+              type="button"
+              class="btn btn-light px-5 m-2"
+              v-on:click="login()"
+            >
+              Cancel
+            </b-button>
           </div>
+          <b-alert
+            variant="danger"
+            dismissible
+            fade
+            :show="showDismissibleAlert"
+            @dismissed="showDismissibleAlert = false"
+          >
+            {{ this.errorText }}
+          </b-alert>
         </div>
-        <div class="row"><img src="../assets/Mobile.svg" height="220vh" /></div>
+        <div class="row">
+          <img
+            src="../assets/Mobile.svg"
+            height="220vh"
+            style="margin-top: 10%"
+          />
+        </div>
         <div>
           <img
             src="../assets/leftCircle.svg"
@@ -111,6 +166,8 @@ export default {
         username: "",
         password: "",
       },
+      showDismissibleAlert: false,
+      errorText: "",
     };
   },
   props: {
@@ -126,7 +183,8 @@ export default {
       if (this.input.username !== "" && this.input.password !== "") {
         this.$socket.emit("get user", this.input.username);
       } else {
-        console.log("A username and password must be present");
+        this.errorText = "There must be a username and password";
+        this.showDismissibleAlert = true;
       }
     },
     /**
@@ -158,7 +216,8 @@ export default {
         }
         // if passwords do not match
         else {
-          console.log("Invalid password!");
+          this.errorText = "Invalid password!";
+          this.showDismissibleAlert = true;
         }
       });
     });
@@ -169,12 +228,6 @@ export default {
 <style>
 #login {
   padding-top: 100px;
-}
-
-#login > button {
-  width: 100px;
-  margin-left: 50px;
-  margin-right: 50px;
 }
 
 #login > div {
@@ -193,13 +246,6 @@ export default {
 
 #loginmobile > div {
   margin-bottom: 20px;
-}
-
-#loginmobile > button {
-  width: 100px;
-  margin-left: 50px;
-  margin-right: 50px;
-  margin-bottom: 15px;
 }
 
 input {
@@ -234,5 +280,33 @@ input {
   right: 0px;
   font-size: 18px;
   z-index: -1;
+}
+
+.login .form-control {
+  border-radius: 30px !important;
+  box-shadow: 0px 5px 5px 0px rgb(180, 180, 180) !important;
+  background-color: #f4fbff !important;
+}
+button.close {
+  padding: 0;
+  background-color: transparent;
+  border: 0;
+}
+.alert-dismissible .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  padding: 0.75rem 1.25rem;
+  color: inherit;
+}
+.close {
+  float: right;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  opacity: 0.5;
 }
 </style>

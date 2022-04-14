@@ -53,6 +53,7 @@ export default {
     onClick(chatId) {
       bus.$emit("chat-click-message-list", chatId);
       bus.$emit("chat-click-canvas", chatId);
+      this.$forceUpdate();
     },
 
     collapsable() {
@@ -71,11 +72,12 @@ export default {
 
 <style scoped>
 nav ul {
-  height: 70vh;
+  height: 65vh;
   width: 100%;
   overflow: hidden;
   overflow-y: scroll;
   padding: 0;
+  margin: 0;
 }
 
 nav {

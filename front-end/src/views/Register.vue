@@ -1,14 +1,14 @@
 <template>
   <div v-if="!isMobile()">
-    <div class="container">
+    <div class="container register">
       <div class="row">
         <div class="col">
-          <img src="../assets/Logo.svg" />
+          <img src="../assets/Logo.svg" class="mt-3" />
           <div id="register">
             <p>Choose a profile avatar</p>
             <img :src="avatar_preview" @click="showModal = true" />
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="text"
                 id="username"
                 name="username"
@@ -16,8 +16,8 @@
                 placeholder="Username"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password"
                 name="password"
@@ -25,8 +25,8 @@
                 placeholder="Password"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password-confirm"
                 name="password-confirm"
@@ -35,16 +35,29 @@
               />
               <router-link to="/">Have an account? Login here!</router-link>
             </div>
-            <button type="button" class="btn btn-dark" v-on:click="register()">
+            <b-button
+              pill
+              variant="dark"
+              class="px-5 mx-4"
+              v-on:click="register()"
+            >
               Register
-            </button>
-            <button type="button" class="btn btn-light" v-on:click="register()">
+            </b-button>
+            <b-button
+              pill
+              variant="outline-dark"
+              type="button"
+              class="btn btn-light px-5 mx-4"
+              v-on:click="register()"
+            >
               Cancel
-            </button>
+            </b-button>
           </div>
         </div>
         <div class="col"></div>
-        <div class="col"><img src="../assets/Mobile.svg" /></div>
+        <div class="col">
+          <img src="../assets/Mobile.svg" style="margin-top: 30%" />
+        </div>
       </div>
       <img src="../assets/leftCircle.svg" class="bottomleft" />
       <img src="../assets/rightCircle.svg" class="bottomright" />
@@ -63,15 +76,20 @@
     </div>
   </div>
   <div v-else>
-    <div class="container">
+    <div class="container register">
       <div class="row">
         <div class="col">
-          <img src="../assets/Logo.svg" width="70%" height="auto" />
+          <img
+            src="../assets/Logo.svg"
+            width="70%"
+            class="mt-3"
+            height="auto"
+          />
           <div id="registermobile">
             <p>Choose a profile avatar</p>
             <img :src="avatar_preview" @click="showModal = true" />
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="text"
                 id="username"
                 name="username"
@@ -79,8 +97,8 @@
                 placeholder="Username"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password"
                 name="password"
@@ -88,25 +106,36 @@
                 placeholder="Password"
               />
             </div>
-            <div class="form-control">
-              <input
+            <div>
+              <b-form-input
                 type="password"
                 id="password-confirm"
                 name="password-confirm"
                 v-model="input.password_confirm"
                 placeholder="Confirm password"
+                class="mb-2"
               />
               <router-link to="/">Have an account? Login here!</router-link>
             </div>
-            <button type="button" class="btn btn-dark" v-on:click="register()">
+            <b-button
+              pill
+              variant="dark"
+              class="px-5 m-2"
+              v-on:click="register()"
+            >
               Register
-            </button>
-            <button type="button" class="btn btn-light" v-on:click="register()">
+            </b-button>
+            <b-button
+              pill
+              variant="outline-dark"
+              type="button"
+              class="btn btn-light px-5 m-2"
+              v-on:click="register()"
+            >
               Cancel
-            </button>
+            </b-button>
           </div>
         </div>
-        <div class="row"><img src="../assets/Mobile.svg" height="220vh" /></div>
       </div>
       <img
         src="../assets/leftCircle.svg"
@@ -250,25 +279,12 @@ export default {
   padding-top: 100px;
 }
 
-#register > button {
-  width: 100px;
-  margin-left: 50px;
-  margin-right: 50px;
-}
-
 #register > div {
   margin-bottom: 20px;
 }
 
 #registermobile {
   padding-top: 10px;
-}
-
-#registermobile > button {
-  width: 100px;
-  margin-left: 30px;
-  margin-right: 30px;
-  margin-bottom: 30px;
 }
 
 #registermobile > div {
@@ -286,6 +302,11 @@ input {
   font-size: 18px;
 }
 
+.register .form-control {
+  border-radius: 30px !important;
+  box-shadow: 0px 5px 5px 0px rgb(180, 180, 180) !important;
+  background-color: #f4fbff !important;
+}
 .bottomleftmobile {
   position: fixed;
   bottom: -100px;
