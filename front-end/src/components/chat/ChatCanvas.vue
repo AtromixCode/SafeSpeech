@@ -40,7 +40,6 @@
     "
   >
     <div style="margin: auto; color: black">Select a chat bro</div>
-    <b-row class="chat-container"><message-list class="chat-display" /></b-row>
   </div>
 </template>
 
@@ -148,6 +147,12 @@ ul::-webkit-scrollbar {
 }
 
 @media screen and (max-width: 1000px) {
+  .chat-options {
+    visibility: hidden !important;
+  }
+  .header {
+    height: 0 !important;
+  }
   .chat-container {
     height: 90% !important;
   }

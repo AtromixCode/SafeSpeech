@@ -278,7 +278,7 @@ button {
 
 @media screen and (max-width: 1000px) {
   .b-sidebar {
-    position: absolute;
+    position: fixed;
     background-color: #2a8bf2 !important;
     height: 100%;
     overflow: hidden !important;
