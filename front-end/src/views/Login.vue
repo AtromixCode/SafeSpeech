@@ -208,6 +208,10 @@ export default {
      * Handles receiving information about the username, chekcs if salted password matches memory password.
      */
     this.$socket.on("user info", (userInfo) => {
+      if (userInfo.password === null) {
+        this.errorText = "Invalid username!";
+        this.showDismissibleAlert = true;
+      }
       bcrypt.compare(this.input.password, userInfo.password, (err, result) => {
         if (result) {
           console.log("It matches!");
