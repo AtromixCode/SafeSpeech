@@ -31,7 +31,7 @@ export default {
   box-shadow: 5px 0px 25px 5px rgb(123, 123, 123);
   -webkit-box-shadow: 5px 0px 25px 5px rgb(123, 123, 123);
   position: absolute;
-  z-index: 10000;
+  z-index: 10;
 }
 .chat-canvas {
   width: 75%;

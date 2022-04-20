@@ -59,8 +59,6 @@
           <img src="../assets/Mobile.svg" style="margin-top: 30%" />
         </div>
       </div>
-      <img src="../assets/leftCircle.svg" class="bottomleft" />
-      <img src="../assets/rightCircle.svg" class="bottomright" />
 
       <Teleport to="body">
         <modal
@@ -137,18 +135,6 @@
           </div>
         </div>
       </div>
-      <img
-        src="../assets/leftCircle.svg"
-        class="bottomleftmobile"
-        height="40%"
-        width="40%"
-      />
-      <img
-        src="../assets/rightCircle.svg"
-        class="bottomrightmobile"
-        height="40%"
-        width="40%"
-      />
       <Teleport to="body">
         <!-- use the modal component, pass in the prop -->
         <modal

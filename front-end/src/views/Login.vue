@@ -62,8 +62,6 @@
           <img src="../assets/Mobile.svg" style="margin-top: 30%" />
         </div>
       </div>
-      <img src="../assets/leftCircle.svg" class="bottomleft" />
-      <img src="../assets/rightCircle.svg" class="bottomright" />
     </div>
   </div>
   <div v-else>
@@ -127,20 +125,6 @@
             src="../assets/Mobile.svg"
             height="220vh"
             style="margin-top: 10%"
-          />
-        </div>
-        <div>
-          <img
-            src="../assets/leftCircle.svg"
-            class="bottomleftmobile"
-            width="40%"
-            height="40%"
-          />
-          <img
-            src="../assets/rightCircle.svg"
-            class="bottomrightmobile"
-            width="40%"
-            height="40%"
           />
         </div>
       </div>

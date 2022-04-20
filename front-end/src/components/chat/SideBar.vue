@@ -241,14 +241,6 @@ export default {
       }
     },
   },
-  mounted() {
-    /**
-     * server oks the username, thus go to the chat page
-     */
-    this.$socket.on("ok username", () => {
-      this.goToChat();
-    });
-  },
 };
 </script>
 
@@ -295,7 +287,6 @@ button {
     height: 100%;
     overflow: hidden !important;
     width: 100% !important;
-    z-index: 9 !important;
   }
 
   .chat-btn-icon,
